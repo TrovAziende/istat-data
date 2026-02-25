@@ -24,82 +24,117 @@ jobs:
       - name: Generate regioni.json
         run: |
           python <<EOF
-          import requests
-          from lxml import etree
-          import json
+import requests
+from lxml import etree
+import json
 
-          # Mappa NUTS → codice ISTAT
-          mappa = {
-              'ITC1': '01','ITC2': '02','ITC3': '07','ITC4': '03',
-              'ITH1': '04','ITH3': '05','ITH4': '06','ITH5': '08',
-              'ITI1': '09','ITI2': '10','ITI3': '11','ITI4': '12',
-              'ITF1': '13','ITF2': '14','ITF3': '15','ITF4': '16',
-              'ITF5': '17','ITF6': '18','ITG1': '19','ITG2': '20'
-          }
+# ===============================
+# CONFIGURAZIONE REGIONI
+# ===============================
 
-          nuts_list = "+".join(mappa.keys())
+mappa = {
+    'ITC1': '01','ITC2': '02','ITC3': '07','ITC4': '03',
+    'ITH1': '04','ITH3': '05','ITH4': '06','ITH5': '08',
+    'ITI1': '09','ITI2': '10','ITI3': '11','ITI4': '12',
+    'ITF1': '13','ITF2': '14','ITF3': '15','ITF4': '16',
+    'ITF5': '17','ITF6': '18','ITG1': '19','ITG2': '20'
+}
 
-          url = (
-              "https://esploradati.istat.it/SDMXWS/rest/data/"
-              "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-              f"A.{nuts_list}.JAN.9..99/ALL/"
-              "?detail=dataonly"
-              "&startPeriod=2020-01-01"
-              "&endPeriod=2025-12-31"
-              "&dimensionAtObservation=TIME_PERIOD"
-          )
+# Dividiamo in 2 gruppi per evitare limiti SDMX
+groups = [
+    ['ITC1','ITC2','ITC3','ITC4','ITH1','ITH3','ITH4','ITH5','ITI1','ITI2'],
+    ['ITI3','ITI4','ITF1','ITF2','ITF3','ITF4','ITF5','ITF6','ITG1','ITG2']
+]
 
-          response = requests.get(url, timeout=120)
-          response.raise_for_status()
+# ===============================
+# FUNZIONE FETCH SDMX
+# ===============================
 
-          root = etree.fromstring(response.content)
+def fetch_group(nuts_group):
 
-          ns = {
-              "g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"
-          }
+    nuts_list = "+".join(nuts_group)
 
-          dataset = {}
+    url = (
+        "https://esploradati.istat.it/SDMXWS/rest/data/"
+        "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
+        f"A.{nuts_list}.JAN.9..99/ALL/"
+        "?detail=dataonly"
+        "&startPeriod=2020-01-01"
+        "&endPeriod=2025-12-31"
+        "&dimensionAtObservation=TIME_PERIOD"
+    )
 
-          series_nodes = root.xpath("//g:Series", namespaces=ns)
+    response = requests.get(url, timeout=120)
+    response.raise_for_status()
 
-          for series in series_nodes:
+    root = etree.fromstring(response.content)
 
-              ref_area = series.xpath("./g:SeriesKey/g:Value[@id='REF_AREA']/@value", namespaces=ns)
-              age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
+    ns = {
+        "g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"
+    }
 
-              if not ref_area or not age:
-                  continue
+    dataset = {}
 
-              if age[0] != "TOTAL":
-                  continue
+    series_nodes = root.xpath("//g:Series", namespaces=ns)
 
-              nuts = ref_area[0]
+    for series in series_nodes:
 
-              if nuts not in mappa:
-                  continue
+        ref_area = series.xpath("./g:SeriesKey/g:Value[@id='REF_AREA']/@value", namespaces=ns)
+        age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
 
-              istat = mappa[nuts]
+        if not ref_area or not age:
+            continue
 
-              observations = series.xpath("./g:Obs", namespaces=ns)
+        if age[0] != "TOTAL":
+            continue
 
-              serie = {}
+        nuts = ref_area[0]
 
-              for obs in observations:
-                  anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
-                  val  = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
-                  serie[anno] = val
+        if nuts not in mappa:
+            continue
 
-              serie = dict(sorted(serie.items()))
+        istat = mappa[nuts]
 
-              dataset[istat] = {
-                  "popolazione": list(serie.values())[-1] if serie else None,
-                  "serie": serie
-              }
+        observations = series.xpath("./g:Obs", namespaces=ns)
 
-          with open("regioni.json", "w", encoding="utf-8") as f:
-              json.dump(dataset, f, ensure_ascii=False, indent=2)
+        serie = {}
 
-          print("regioni.json generato con tutte le regioni")
+        for obs in observations:
+            anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
+            val  = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+            serie[anno] = val
+
+        serie = dict(sorted(serie.items()))
+
+        dataset[istat] = {
+            "popolazione": {
+                "attuale": list(serie.values())[-1] if serie else None,
+                "serie": serie
+            },
+            "pil": None,
+            "superficie": None,
+            "imprese": None
+        }
+
+    return dataset
+
+# ===============================
+# COSTRUZIONE DATASET COMPLETO
+# ===============================
+
+final_dataset = {}
+
+for group in groups:
+    group_data = fetch_group(group)
+    final_dataset.update(group_data)
+
+# Ordiniamo per codice ISTAT
+final_dataset = dict(sorted(final_dataset.items()))
+
+with open("regioni.json", "w", encoding="utf-8") as f:
+    json.dump(final_dataset, f, ensure_ascii=False, indent=2)
+
+print("regioni.json generato - struttura scalabile")
           EOF
     
       - name: Commit and push if changed
