@@ -5,7 +5,6 @@
     "superficie_km2": 25387,
     "popolazione": 4251868,
     "serie_popolazione": {
-      "2021": 4274945,
       "2022": 4256350,
       "2023": 4251351,
       "2024": 4251623,
@@ -18,7 +17,6 @@
     "superficie_km2": 3263,
     "popolazione": 122532,
     "serie_popolazione": {
-      "2021": 124089,
       "2022": 123360,
       "2023": 123130,
       "2024": 122877,
@@ -31,37 +29,46 @@
     "superficie_km2": 23863,
     "popolazione": 10033918,
     "serie_popolazione": {
-      "2021": 9981554,
       "2022": 9943004,
       "2023": 9976509,
       "2024": 10012054,
       "2025": 10033918
     }
   },
+  "04": {
+    "nome": "Trentino-Alto Adige",
+    "slug": "trentino-alto-adige",
+    "superficie_km2": 13607,
+    "popolazione": 1086252,
+    "serie_popolazione": {
+      "2022": 1073574,
+      "2023": 1077143,
+      "2024": 1082702,
+      "2025": 1086252
+    }
+  },
   "05": {
     "nome": "Veneto",
     "slug": "veneto",
     "superficie_km2": 18345,
-    "popolazione": 539679,
+    "popolazione": 4853472,
     "serie_popolazione": {
-      "2021": 534912,
-      "2022": 532616,
-      "2023": 534147,
-      "2024": 537533,
-      "2025": 539679
+      "2022": 4847745,
+      "2023": 4849553,
+      "2024": 4852216,
+      "2025": 4853472
     }
   },
   "06": {
     "nome": "Friuli-Venezia Giulia",
     "slug": "friuli-venezia-giulia",
     "superficie_km2": 7924,
-    "popolazione": 546573,
+    "popolazione": 1193284,
     "serie_popolazione": {
-      "2021": 542166,
-      "2022": 540958,
-      "2023": 542996,
-      "2024": 545169,
-      "2025": 546573
+      "2022": 1194647,
+      "2023": 1194248,
+      "2024": 1194616,
+      "2025": 1193284
     }
   },
   "07": {
@@ -70,7 +77,6 @@
     "superficie_km2": 5416,
     "popolazione": 1510143,
     "serie_popolazione": {
-      "2021": 1518495,
       "2022": 1509227,
       "2023": 1507636,
       "2024": 1509140,
@@ -81,169 +87,156 @@
     "nome": "Emilia-Romagna",
     "slug": "emilia-romagna",
     "superficie_km2": 22453,
-    "popolazione": 4853472,
-    "serie_popolazione": {
-      "2021": 4869830,
-      "2022": 4847745,
-      "2023": 4849553,
-      "2024": 4852216,
-      "2025": 4853472
-    }
-  },
-  "09": {
-    "nome": "Toscana",
-    "slug": "toscana",
-    "superficie_km2": 22987,
-    "popolazione": 1193284,
-    "serie_popolazione": {
-      "2021": 1201510,
-      "2022": 1194647,
-      "2023": 1194248,
-      "2024": 1194616,
-      "2025": 1193284
-    }
-  },
-  "10": {
-    "nome": "Umbria",
-    "slug": "umbria",
-    "superficie_km2": 8456,
     "popolazione": 4461998,
     "serie_popolazione": {
-      "2021": 4438937,
       "2022": 4425366,
       "2023": 4437578,
       "2024": 4451938,
       "2025": 4461998
     }
   },
-  "11": {
-    "nome": "Marche",
-    "slug": "marche",
-    "superficie_km2": 9366,
-    "popolazione": 1086252,
-    "serie_popolazione": {
-      "2021": 1077078,
-      "2022": 1073574,
-      "2023": 1077143,
-      "2024": 1082702,
-      "2025": 1086252
-    }
-  },
-  "12": {
-    "nome": "Lazio",
-    "slug": "lazio",
-    "superficie_km2": 17232,
+  "09": {
+    "nome": "Toscana",
+    "slug": "toscana",
+    "superficie_km2": 22987,
     "popolazione": 3657716,
     "serie_popolazione": {
-      "2021": 3692865,
       "2022": 3663191,
       "2023": 3661981,
       "2024": 3660530,
       "2025": 3657716
     }
   },
-  "13": {
-    "nome": "Abruzzo",
-    "slug": "abruzzo",
-    "superficie_km2": 10831,
+  "10": {
+    "nome": "Umbria",
+    "slug": "umbria",
+    "superficie_km2": 8456,
     "popolazione": 851473,
     "serie_popolazione": {
-      "2021": 865452,
       "2022": 858812,
       "2023": 856407,
       "2024": 853068,
       "2025": 851473
     }
   },
-  "14": {
-    "nome": "Molise",
-    "slug": "molise",
-    "superficie_km2": 4460,
+  "11": {
+    "nome": "Marche",
+    "slug": "marche",
+    "superficie_km2": 9366,
     "popolazione": 1480545,
     "serie_popolazione": {
-      "2021": 1498236,
       "2022": 1487150,
       "2023": 1484298,
       "2024": 1482746,
       "2025": 1480545
     }
   },
-  "15": {
-    "nome": "Campania",
-    "slug": "campania",
-    "superficie_km2": 13671,
+  "12": {
+    "nome": "Lazio",
+    "slug": "lazio",
+    "superficie_km2": 17232,
     "popolazione": 5709178,
     "serie_popolazione": {
-      "2021": 5730399,
       "2022": 5714882,
       "2023": 5720536,
       "2024": 5714745,
       "2025": 5709178
     }
   },
-  "16": {
-    "nome": "Puglia",
-    "slug": "puglia",
-    "superficie_km2": 19359,
+  "13": {
+    "nome": "Abruzzo",
+    "slug": "abruzzo",
+    "superficie_km2": 10831,
     "popolazione": 1269118,
     "serie_popolazione": {
-      "2021": 1281012,
       "2022": 1275950,
       "2023": 1272627,
       "2024": 1269571,
       "2025": 1269118
     }
   },
-  "17": {
-    "nome": "Basilicata",
-    "slug": "basilicata",
-    "superficie_km2": 9992,
+  "14": {
+    "nome": "Molise",
+    "slug": "molise",
+    "superficie_km2": 4460,
     "popolazione": 287814,
     "serie_popolazione": {
-      "2021": 294294,
       "2022": 292150,
       "2023": 290636,
       "2024": 289224,
       "2025": 287814
     }
   },
-  "18": {
-    "nome": "Calabria",
-    "slug": "calabria",
-    "superficie_km2": 15080,
+  "15": {
+    "nome": "Campania",
+    "slug": "campania",
+    "superficie_km2": 13671,
     "popolazione": 5582337,
     "serie_popolazione": {
-      "2021": 5624260,
       "2022": 5624420,
       "2023": 5609536,
       "2024": 5593906,
       "2025": 5582337
     }
   },
-  "19": {
-    "nome": "Sicilia",
-    "slug": "sicilia",
-    "superficie_km2": 25711,
+  "16": {
+    "nome": "Puglia",
+    "slug": "puglia",
+    "superficie_km2": 19359,
     "popolazione": 3877395,
     "serie_popolazione": {
-      "2021": 3933777,
       "2022": 3922941,
       "2023": 3907683,
       "2024": 3890661,
       "2025": 3877395
     }
   },
-  "20": {
-    "nome": "Sardegna",
-    "slug": "sardegna",
-    "superficie_km2": 24100,
+  "17": {
+    "nome": "Basilicata",
+    "slug": "basilicata",
+    "superficie_km2": 9992,
     "popolazione": 530004,
     "serie_popolazione": {
-      "2021": 545130,
       "2022": 541168,
       "2023": 537577,
       "2024": 533233,
       "2025": 530004
+    }
+  },
+  "18": {
+    "nome": "Calabria",
+    "slug": "calabria",
+    "superficie_km2": 15080,
+    "popolazione": 1834646,
+    "serie_popolazione": {
+      "2022": 1855454,
+      "2023": 1846610,
+      "2024": 1838568,
+      "2025": 1834646
+    }
+  },
+  "19": {
+    "nome": "Sicilia",
+    "slug": "sicilia",
+    "superficie_km2": 25711,
+    "popolazione": 4787390,
+    "serie_popolazione": {
+      "2022": 4833329,
+      "2023": 4814016,
+      "2024": 4797359,
+      "2025": 4787390
+    }
+  },
+  "20": {
+    "nome": "Sardegna",
+    "slug": "sardegna",
+    "superficie_km2": 24100,
+    "popolazione": 1562381,
+    "serie_popolazione": {
+      "2022": 1587413,
+      "2023": 1578146,
+      "2024": 1570453,
+      "2025": 1562381
     }
   }
 }
