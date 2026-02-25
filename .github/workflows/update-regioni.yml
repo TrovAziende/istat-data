@@ -1,0 +1,115 @@
+name: Update ISTAT Regioni
+
+on:
+  schedule:
+    - cron: "0 3 1 */3 *"   # Ogni 3 mesi (1° giorno, ore 03:00 UTC)
+  workflow_dispatch:        # Permette avvio manuale
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests lxml
+
+      - name: Generate regioni.json
+        run: |
+          python <<EOF
+          import requests
+          from lxml import etree
+          import json
+          from datetime import datetime
+
+          regioni = {
+              'ITC1': '01',
+              'ITC2': '02',
+              'ITC3': '07',
+              'ITC4': '03',
+              'ITH1': '04',
+              'ITH3': '05',
+              'ITH4': '06',
+              'ITH5': '08',
+              'ITI1': '09',
+              'ITI2': '10',
+              'ITI3': '11',
+              'ITI4': '12',
+              'ITF1': '13',
+              'ITF2': '14',
+              'ITF3': '15',
+              'ITF4': '16',
+              'ITF5': '17',
+              'ITF6': '18',
+              'ITG1': '19',
+              'ITG2': '20'
+          }
+
+          dataset = {}
+
+          for nuts, istat in regioni.items():
+
+              url = (
+                  "https://esploradati.istat.it/SDMXWS/rest/data/"
+                  "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
+                  f"A.{nuts}.JAN.9..99/ALL/"
+                  "?detail=dataonly"
+                  "&startPeriod=2020-01-01"
+                  "&endPeriod=2025-12-31"
+                  "&dimensionAtObservation=TIME_PERIOD"
+              )
+
+              try:
+                  response = requests.get(url, timeout=60)
+                  response.raise_for_status()
+              except Exception:
+                  continue
+
+              root = etree.fromstring(response.content)
+
+              ns = {
+                  "g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"
+              }
+
+              series_nodes = root.xpath("//g:Series", namespaces=ns)
+
+              for series in series_nodes:
+                  age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
+                  if not age or age[0] != "TOTAL":
+                      continue
+
+                  observations = series.xpath("./g:Obs", namespaces=ns)
+
+                  serie = {}
+                  for obs in observations:
+                      anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
+                      val = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+                      serie[anno] = val
+
+                  serie = dict(sorted(serie.items()))
+
+                  dataset[istat] = {
+                      "popolazione": list(serie.values())[-1] if serie else None,
+                      "serie": serie
+                  }
+
+          with open("regioni.json", "w", encoding="utf-8") as f:
+              json.dump(dataset, f, ensure_ascii=False, indent=2)
+
+          print("regioni.json generato")
+          EOF
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add regioni.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico regioni.json"
+          git push
