@@ -24,90 +24,90 @@ jobs:
       - name: Create Python script
         run: |
           cat << 'PYTHON' > script.py
-import requests
-from lxml import etree
-import json
+          import requests
+          from lxml import etree
+          import json
 
-mappa = {
-    'ITC1':'01','ITC2':'02','ITC3':'07','ITC4':'03',
-    'ITH3':'05','ITH4':'06','ITH5':'08',
-    'ITI1':'09','ITI2':'10','ITI3':'11','ITI4':'12',
-    'ITF1':'13','ITF2':'14','ITF3':'15','ITF4':'16',
-    'ITF5':'17','ITF6':'18','ITG1':'19','ITG2':'20'
-}
+          mappa = {
+              'ITC1':'01','ITC2':'02','ITC3':'07','ITC4':'03',
+              'ITH3':'05','ITH4':'06','ITH5':'08',
+              'ITI1':'09','ITI2':'10','ITI3':'11','ITI4':'12',
+              'ITF1':'13','ITF2':'14','ITF3':'15','ITF4':'16',
+              'ITF5':'17','ITF6':'18','ITG1':'19','ITG2':'20'
+          }
 
-dataset = {}
+          dataset = {}
 
-def get_region_data(nuts):
-    url = (
-        "https://esploradati.istat.it/SDMXWS/rest/data/"
-        "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-        f"A.{nuts}.JAN.9..99/ALL/"
-        "?detail=dataonly"
-        "&startPeriod=2020-01-01"
-        "&endPeriod=2025-12-31"
-        "&dimensionAtObservation=TIME_PERIOD"
-    )
+          def get_region_data(nuts):
+              url = (
+                  "https://esploradati.istat.it/SDMXWS/rest/data/"
+                  "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
+                  f"A.{nuts}.JAN.9..99/ALL/"
+                  "?detail=dataonly"
+                  "&startPeriod=2020-01-01"
+                  "&endPeriod=2025-12-31"
+                  "&dimensionAtObservation=TIME_PERIOD"
+              )
 
-    response = requests.get(url, timeout=120)
-    if response.status_code != 200:
-        print(f"Errore su {nuts}")
-        return None
+              response = requests.get(url, timeout=120)
+              if response.status_code != 200:
+                  print(f"Errore su {nuts}")
+                  return None
 
-    root = etree.fromstring(response.content)
+              root = etree.fromstring(response.content)
 
-    ns = {
-        "g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"
-    }
+              ns = {
+                  "g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"
+              }
 
-    series_nodes = root.xpath("//g:Series", namespaces=ns)
+              series_nodes = root.xpath("//g:Series", namespaces=ns)
 
-    for series in series_nodes:
-        age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
-        if not age or age[0] != "TOTAL":
-            continue
+              for series in series_nodes:
+                  age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
+                  if not age or age[0] != "TOTAL":
+                      continue
 
-        observations = series.xpath("./g:Obs", namespaces=ns)
+                  observations = series.xpath("./g:Obs", namespaces=ns)
 
-        serie = {}
-        for obs in observations:
-            anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
-            val  = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
-            serie[anno] = val
+                  serie = {}
+                  for obs in observations:
+                      anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
+                      val  = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+                      serie[anno] = val
 
-        return dict(sorted(serie.items()))
+                  return dict(sorted(serie.items()))
 
-    return None
+              return None
 
-# Regioni normali
-for nuts, istat in mappa.items():
-    serie = get_region_data(nuts)
-    if not serie:
-        continue
+          # Regioni normali
+          for nuts, istat in mappa.items():
+              serie = get_region_data(nuts)
+              if not serie:
+                  continue
 
-    dataset[istat] = {
-        "popolazione": list(serie.values())[-1],
-        "serie": serie
-    }
+              dataset[istat] = {
+                  "popolazione": list(serie.values())[-1],
+                  "serie": serie
+              }
 
-# Trentino-Alto Adige (somma Bolzano + Trento)
-bolzano = get_region_data("ITH10")
-trento  = get_region_data("ITH20")
+          # Trentino-Alto Adige (somma Bolzano + Trento)
+          bolzano = get_region_data("ITH10")
+          trento  = get_region_data("ITH20")
 
-if bolzano and trento:
-    serie = {}
-    for anno in bolzano:
-        serie[anno] = bolzano[anno] + trento[anno]
+          if bolzano and trento:
+              serie = {}
+              for anno in bolzano:
+                  serie[anno] = bolzano[anno] + trento[anno]
 
-    dataset["04"] = {
-        "popolazione": list(serie.values())[-1],
-        "serie": serie
-    }
+              dataset["04"] = {
+                  "popolazione": list(serie.values())[-1],
+                  "serie": serie
+              }
 
-with open("regioni.json", "w", encoding="utf-8") as f:
-    json.dump(dataset, f, ensure_ascii=False, indent=2)
+          with open("regioni.json", "w", encoding="utf-8") as f:
+              json.dump(dataset, f, ensure_ascii=False, indent=2)
 
-print("regioni.json generato correttamente")
+          print("regioni.json generato correttamente")
           PYTHON
 
       - name: Run script
