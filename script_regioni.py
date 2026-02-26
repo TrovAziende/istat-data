@@ -1,15 +1,15 @@
+cat <<'PYTHON' > script.py
 import requests
 from lxml import etree
 import json
+import time
 from datetime import datetime
-import re
 
-current_year = datetime.now().year
+# -------------------------
+# CONFIG REGIONI
+# -------------------------
 
-pop_start = current_year - 5
-pop_end   = current_year
-
-regioni_info = {
+regioni = {
     "ITC1": ("01", "Piemonte", "piemonte", 25387),
     "ITC2": ("02", "Valle d'Aosta", "valle-daosta", 3263),
     "ITC3": ("07", "Liguria", "liguria", 5416),
@@ -32,53 +32,91 @@ regioni_info = {
     "ITG2": ("20", "Sardegna", "sardegna", 24100),
 }
 
-def fetch_sdmx(url):
-    response = requests.get(url, timeout=120)
-    response.raise_for_status()
-    root = etree.fromstring(response.content)
-    ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
-    return root, ns
+# -------------------------
+# ANNI DINAMICI (ULTIMI 5)
+# -------------------------
 
-print("Scarico popolazione regioni...")
+anno_corrente = datetime.now().year
+anno_inizio = anno_corrente - 4
 
-nuts_list = "+".join(regioni_info.keys())
+nuts_list = "+".join(regioni.keys())
 
 url = (
     "https://esploradati.istat.it/SDMXWS/rest/data/"
     "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
     f"A.{nuts_list}.JAN.9..99/ALL/"
-    f"?detail=dataonly&startPeriod={pop_start}-01-01&endPeriod={pop_end}-12-31"
+    "?detail=dataonly"
+    f"&startPeriod={anno_inizio}-01-01"
+    f"&endPeriod={anno_corrente}-12-31"
     "&dimensionAtObservation=TIME_PERIOD"
 )
 
-root, ns = fetch_sdmx(url)
+# -------------------------
+# FETCH CON RETRY
+# -------------------------
+
+def fetch(url):
+    for i in range(3):
+        try:
+            print(f"Tentativo {i+1} download popolazione...")
+            r = requests.get(url, timeout=180, headers={"Accept-Encoding": "gzip"})
+            r.raise_for_status()
+            return r.content
+        except Exception as e:
+            print("Errore:", e)
+            time.sleep(10)
+    raise Exception("Errore persistente download ISTAT")
+
+print("Download popolazione regioni...")
+xml_data = fetch(url)
+
+# -------------------------
+# PARSING XML
+# -------------------------
+
+root = etree.fromstring(xml_data)
+ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
 
 dataset = {}
 
 for series in root.xpath("//g:Series", namespaces=ns):
 
-    nuts = series.xpath("./g:SeriesKey/g:Value[@id='REF_AREA']/@value", namespaces=ns)[0]
+    ref_area = series.xpath("./g:SeriesKey/g:Value[@id='REF_AREA']/@value", namespaces=ns)
+    age = series.xpath("./g:SeriesKey/g:Value[@id='AGE']/@value", namespaces=ns)
 
-    if nuts not in regioni_info:
+    if not ref_area or not age:
         continue
 
-    istat, nome, slug, sup = regioni_info[nuts]
+    if age[0] != "TOTAL":
+        continue
+
+    nuts = ref_area[0]
+
+    if nuts not in regioni:
+        continue
+
+    codice, nome, slug, superficie = regioni[nuts]
 
     serie = {}
     for obs in series.xpath("./g:Obs", namespaces=ns):
-        anno = re.findall(r"\d{4}", obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0])[0]
-        val = int(float(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0]))
-        serie[anno] = val
+        anno = obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
+        valore = int(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+        serie[anno] = valore
 
-    dataset[istat] = {
+    serie = dict(sorted(serie.items()))
+
+    dataset[codice] = {
         "nome": nome,
         "slug": slug,
-        "superficie_km2": sup,
+        "superficie_km2": superficie,
         "popolazione": list(serie.values())[-1] if serie else None,
-        "serie_popolazione": dict(sorted(serie.items()))
+        "serie_popolazione": serie
     }
+
+dataset = dict(sorted(dataset.items()))
 
 with open("regioni.json", "w", encoding="utf-8") as f:
     json.dump(dataset, f, ensure_ascii=False, indent=2)
 
 print("regioni.json aggiornato correttamente")
+PYTHON
