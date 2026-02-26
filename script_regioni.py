@@ -64,25 +64,34 @@ def fetch_sdmx(url):
 dataset = {}
 
 # ===============================
-# POPOLAZIONE
+# POPOLAZIONE (QUERY UNICA STABILE)
 # ===============================
 
-for nuts, (istat, nome, slug, sup) in regioni_info.items():
+print("Scarico popolazione (query cumulativa stabile)")
 
-    print(f"Popolazione {nome}")
+nuts_list = "+".join(regioni_info.keys())
 
-    url = (
-        "https://esploradati.istat.it/SDMXWS/rest/data/"
-        "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-        f"A.{nuts}.JAN.9..99/ALL/"
-        f"?detail=dataonly&startPeriod={pop_start}-01-01&endPeriod={pop_end}-12-31"
-        "&dimensionAtObservation=TIME_PERIOD"
-    )
+url = (
+    "https://esploradati.istat.it/SDMXWS/rest/data/"
+    "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
+    f"A.{nuts_list}.JAN.9..99/ALL/"
+    f"?detail=dataonly&startPeriod={pop_start}-01-01&endPeriod={pop_end}-12-31"
+    "&dimensionAtObservation=TIME_PERIOD"
+)
 
-    root, ns = fetch_sdmx(url)
+root, ns = fetch_sdmx(url)
+
+for series in root.xpath("//g:Series", namespaces=ns):
+
+    nuts = series.xpath("./g:SeriesKey/g:Value[@id='REF_AREA']/@value", namespaces=ns)[0]
+
+    if nuts not in regioni_info:
+        continue
+
+    istat, nome, slug, sup = regioni_info[nuts]
 
     serie = {}
-    for obs in root.xpath("//g:Obs", namespaces=ns):
+    for obs in series.xpath("./g:Obs", namespaces=ns):
         anno = re.findall(r"\d{4}", obs.xpath("./g:ObsDimension/@value", namespaces=ns)[0])[0]
         val = int(float(obs.xpath("./g:ObsValue/@value", namespaces=ns)[0]))
         serie[anno] = val
