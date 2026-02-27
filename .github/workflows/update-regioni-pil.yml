@@ -65,7 +65,7 @@ jobs:
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
               "IT1,93_498_DF_DCCN_PILT_1,1.0/"
-              f"A.IT+{nuts_list}.B1GQ.V.N./"
+              f"A.IT+{nuts_list}.B1G_B_W2_S1.V.N./"
               "ALL?detail=dataonly"
           )
 
