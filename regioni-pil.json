@@ -1,5 +1,6 @@
 {
   "01": {
+    "nome": "Piemonte",
     "anno_ultimo": 2024,
     "valore_milioni": 146726.3,
     "serie_5_anni": {
@@ -13,6 +14,7 @@
     "rank_pil": 5
   },
   "02": {
+    "nome": "Valle d'Aosta",
     "anno_ultimo": 2024,
     "valore_milioni": 5230.5,
     "serie_5_anni": {
@@ -26,6 +28,7 @@
     "rank_pil": 20
   },
   "03": {
+    "nome": "Lombardia",
     "anno_ultimo": 2024,
     "valore_milioni": 451114.0,
     "serie_5_anni": {
@@ -39,6 +42,7 @@
     "rank_pil": 1
   },
   "04": {
+    "nome": "Trentino-Alto Adige",
     "anno_ultimo": 2024,
     "valore_milioni": 52853.5,
     "serie_5_anni": {
@@ -52,6 +56,7 @@
     "rank_pil": 10
   },
   "05": {
+    "nome": "Veneto",
     "anno_ultimo": 2024,
     "valore_milioni": 179868.0,
     "serie_5_anni": {
@@ -65,6 +70,7 @@
     "rank_pil": 3
   },
   "06": {
+    "nome": "Friuli-Venezia Giulia",
     "anno_ultimo": 2024,
     "valore_milioni": 41651.5,
     "serie_5_anni": {
@@ -78,6 +84,7 @@
     "rank_pil": 13
   },
   "07": {
+    "nome": "Liguria",
     "anno_ultimo": 2024,
     "valore_milioni": 52695.9,
     "serie_5_anni": {
@@ -91,6 +98,7 @@
     "rank_pil": 11
   },
   "08": {
+    "nome": "Emilia-Romagna",
     "anno_ultimo": 2024,
     "valore_milioni": 177320.3,
     "serie_5_anni": {
@@ -104,6 +112,7 @@
     "rank_pil": 4
   },
   "09": {
+    "nome": "Toscana",
     "anno_ultimo": 2024,
     "valore_milioni": 128313.0,
     "serie_5_anni": {
@@ -117,6 +126,7 @@
     "rank_pil": 6
   },
   "10": {
+    "nome": "Umbria",
     "anno_ultimo": 2024,
     "valore_milioni": 24733.9,
     "serie_5_anni": {
@@ -130,6 +140,7 @@
     "rank_pil": 17
   },
   "11": {
+    "nome": "Marche",
     "anno_ultimo": 2024,
     "valore_milioni": 45144.2,
     "serie_5_anni": {
@@ -143,6 +154,7 @@
     "rank_pil": 12
   },
   "12": {
+    "nome": "Lazio",
     "anno_ultimo": 2024,
     "valore_milioni": 220303.0,
     "serie_5_anni": {
@@ -156,6 +168,7 @@
     "rank_pil": 2
   },
   "13": {
+    "nome": "Abruzzo",
     "anno_ultimo": 2024,
     "valore_milioni": 36430.7,
     "serie_5_anni": {
@@ -169,6 +182,7 @@
     "rank_pil": 15
   },
   "14": {
+    "nome": "Molise",
     "anno_ultimo": 2024,
     "valore_milioni": 7138.3,
     "serie_5_anni": {
@@ -182,6 +196,7 @@
     "rank_pil": 19
   },
   "15": {
+    "nome": "Campania",
     "anno_ultimo": 2024,
     "valore_milioni": 122903.6,
     "serie_5_anni": {
@@ -195,6 +210,7 @@
     "rank_pil": 7
   },
   "16": {
+    "nome": "Puglia",
     "anno_ultimo": 2024,
     "valore_milioni": 84468.6,
     "serie_5_anni": {
@@ -208,6 +224,7 @@
     "rank_pil": 9
   },
   "17": {
+    "nome": "Basilicata",
     "anno_ultimo": 2024,
     "valore_milioni": 13481.2,
     "serie_5_anni": {
@@ -221,6 +238,7 @@
     "rank_pil": 18
   },
   "18": {
+    "nome": "Calabria",
     "anno_ultimo": 2024,
     "valore_milioni": 35754.0,
     "serie_5_anni": {
@@ -234,6 +252,7 @@
     "rank_pil": 16
   },
   "19": {
+    "nome": "Sicilia",
     "anno_ultimo": 2024,
     "valore_milioni": 100129.1,
     "serie_5_anni": {
@@ -247,6 +266,7 @@
     "rank_pil": 8
   },
   "20": {
+    "nome": "Sardegna",
     "anno_ultimo": 2024,
     "valore_milioni": 38850.1,
     "serie_5_anni": {
@@ -258,5 +278,10 @@
     },
     "quota_percentuale_nazionale": 1.98,
     "rank_pil": 14
+  },
+  "IT": {
+    "nome": "Italia",
+    "anno_ultimo": 2024,
+    "valore_milioni": 1965960.4
   }
 }
