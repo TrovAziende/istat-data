@@ -67,7 +67,7 @@ jobs:
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
               "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-              f"A.{nuts_list}.JAN.TOTAL..99/{anno}"
+              f"A.{nuts_list}.JAN.9..99/{anno}"
               "?detail=dataonly"
           )
 
