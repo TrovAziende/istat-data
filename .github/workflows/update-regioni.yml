@@ -58,42 +58,43 @@ jobs:
           }
 
           # =========================
-          # ANNI DINAMICI (ULTIMI 5)
+          # ANNO ULTIMO DISPONIBILE
           # =========================
 
-          anno_corrente = datetime.now().year
-          anno_inizio = anno_corrente - 4
-
+          anno = datetime.now().year - 1
           nuts_list = "+".join(regioni.keys())
 
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
               "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-              f"A.{nuts_list}.JAN.9..99/ALL/"
+              f"A.{nuts_list}.JAN.TOTAL..99/{anno}"
               "?detail=dataonly"
-              f"&startPeriod={anno_inizio}-01-01"
-              f"&endPeriod={anno_corrente}-12-31"
-              "&dimensionAtObservation=TIME_PERIOD"
           )
 
           # =========================
-          # FETCH CON RETRY
+          # FETCH ROBUSTO
           # =========================
 
           def fetch(url):
-              for i in range(3):
+              headers = {
+                  "User-Agent": "Mozilla/5.0 (compatible; ISTAT-bot/1.0)",
+                  "Accept-Encoding": "gzip"
+              }
+
+              for i in range(5):
                   try:
                       print(f"Tentativo {i+1} download popolazione...")
                       r = requests.get(
                           url,
-                          timeout=180,
-                          headers={"Accept-Encoding": "gzip"}
+                          timeout=60,
+                          headers=headers
                       )
                       r.raise_for_status()
                       return r.content
                   except Exception as e:
                       print("Errore:", e)
-                      time.sleep(10)
+                      time.sleep(5)
+
               raise Exception("Errore persistente download ISTAT")
 
           print("Download popolazione regioni...")
@@ -114,15 +115,8 @@ jobs:
                   "./g:SeriesKey/g:Value[@id='REF_AREA']/@value",
                   namespaces=ns
               )
-              age = series.xpath(
-                  "./g:SeriesKey/g:Value[@id='AGE']/@value",
-                  namespaces=ns
-              )
 
-              if not ref_area or not age:
-                  continue
-
-              if age[0] != "TOTAL":
+              if not ref_area:
                   continue
 
               nuts = ref_area[0]
@@ -132,26 +126,16 @@ jobs:
 
               codice, nome, slug, superficie = regioni[nuts]
 
-              serie = {}
-              for obs in series.xpath("./g:Obs", namespaces=ns):
-                  anno = obs.xpath(
-                      "./g:ObsDimension/@value",
-                      namespaces=ns
-                  )[0]
-                  valore = int(obs.xpath(
-                      "./g:ObsValue/@value",
-                      namespaces=ns
-                  )[0])
-                  serie[anno] = valore
+              obs = series.xpath("./g:Obs/g:ObsValue/@value", namespaces=ns)
 
-              serie = dict(sorted(serie.items()))
+              popolazione = int(obs[0]) if obs else None
 
               dataset[codice] = {
                   "nome": nome,
                   "slug": slug,
                   "superficie_km2": superficie,
-                  "popolazione": list(serie.values())[-1] if serie else None,
-                  "serie_popolazione": serie
+                  "anno": anno,
+                  "popolazione": popolazione
               }
 
           dataset = dict(sorted(dataset.items()))
