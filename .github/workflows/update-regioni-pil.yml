@@ -114,6 +114,14 @@ jobs:
 
               area = ref_area[0]
 
+              edition = series.xpath(
+                  "./g:SeriesKey/g:Value[@id='EDITION']/@value",
+                  namespaces=ns
+              )
+              
+              if not edition or edition[0] != "2025M12":
+                  continue
+
               obs = series.xpath("./g:Obs", namespaces=ns)
 
               dati_annuali = {}
