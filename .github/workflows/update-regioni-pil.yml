@@ -1,0 +1,175 @@
+name: Update ISTAT Regioni PIL
+
+on:
+  schedule:
+    - cron: "30 3 1 */3 *"
+  workflow_dispatch:
+
+jobs:
+  update-pil:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests lxml
+
+      - name: Create Python script
+        run: |
+          cat << 'PYTHON' > script.py
+          import requests
+          from lxml import etree
+          import json
+          import time
+
+          # =========================
+          # CONFIG REGIONI
+          # =========================
+
+          regioni = {
+              "ITC1": "01",
+              "ITC2": "02",
+              "ITC3": "07",
+              "ITC4": "03",
+              "ITDA": "04",
+              "ITD3": "05",
+              "ITD4": "06",
+              "ITD5": "08",
+              "ITE1": "09",
+              "ITE2": "10",
+              "ITE3": "11",
+              "ITE4": "12",
+              "ITF1": "13",
+              "ITF2": "14",
+              "ITF3": "15",
+              "ITF4": "16",
+              "ITF5": "17",
+              "ITF6": "18",
+              "ITG1": "19",
+              "ITG2": "20",
+          }
+
+          nuts_list = "+".join(regioni.keys())
+
+          url = (
+              "https://esploradati.istat.it/SDMXWS/rest/data/"
+              "IT1,93_498_DF_DCCN_PILT_1,1.0/"
+              f"A.IT+{nuts_list}.B1GQ.CP_MEUR/"
+              "ALL?detail=dataonly"
+          )
+
+          def fetch(url):
+              headers = {
+                  "User-Agent": "Mozilla/5.0",
+                  "Accept-Encoding": "gzip"
+              }
+              for i in range(5):
+                  try:
+                      print(f"Tentativo {i+1} download PIL...")
+                      r = requests.get(url, timeout=60, headers=headers)
+                      r.raise_for_status()
+                      return r.content
+                  except Exception as e:
+                      print("Errore:", e)
+                      time.sleep(5)
+              raise Exception("Errore persistente download ISTAT PIL")
+
+          print("Download PIL regioni...")
+          xml_data = fetch(url)
+
+          root = etree.fromstring(xml_data)
+          ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
+
+          serie_regioni = {}
+          pil_italia = {}
+
+          for series in root.xpath("//g:Series", namespaces=ns):
+
+              ref_area = series.xpath(
+                  "./g:SeriesKey/g:Value[@id='REF_AREA']/@value",
+                  namespaces=ns
+              )
+
+              if not ref_area:
+                  continue
+
+              area = ref_area[0]
+
+              obs = series.xpath("./g:Obs", namespaces=ns)
+
+              dati_annuali = {}
+
+              for o in obs:
+                  anno = int(o.xpath("./g:ObsDimension/@value", namespaces=ns)[0])
+                  valore = float(o.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+                  dati_annuali[anno] = valore
+
+              if area == "IT":
+                  pil_italia = dati_annuali
+              elif area in regioni:
+                  serie_regioni[area] = dati_annuali
+
+          ultimo_anno = max(pil_italia.keys())
+          ultimi_5_anni = sorted([a for a in pil_italia.keys() if a <= ultimo_anno])[-5:]
+
+          pil_italia_ultimo = pil_italia[ultimo_anno]
+
+          dataset_temp = {}
+
+          for nuts, serie in serie_regioni.items():
+
+              codice = regioni[nuts]
+
+              serie_filtrata = {
+                  str(a): round(serie[a], 1)
+                  for a in ultimi_5_anni if a in serie
+              }
+
+              valore_ultimo = round(serie[ultimo_anno], 1)
+
+              quota = round((valore_ultimo / pil_italia_ultimo) * 100, 2)
+
+              dataset_temp[codice] = {
+                  "anno_ultimo": ultimo_anno,
+                  "valore_milioni": valore_ultimo,
+                  "serie_5_anni": serie_filtrata,
+                  "quota_percentuale_nazionale": quota
+              }
+
+          ordinati = sorted(
+              dataset_temp.items(),
+              key=lambda x: x[1]["valore_milioni"],
+              reverse=True
+          )
+
+          dataset_finale = {}
+
+          for rank, (codice, dati) in enumerate(ordinati, start=1):
+              dati["rank_pil"] = rank
+              dataset_finale[codice] = dati
+
+          dataset_finale = dict(sorted(dataset_finale.items()))
+
+          with open("regioni-pil.json", "w", encoding="utf-8") as f:
+              json.dump(dataset_finale, f, ensure_ascii=False, indent=2)
+
+          print("regioni-pil.json aggiornato correttamente")
+          PYTHON
+
+      - name: Run script
+        run: python script.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add regioni-pil.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico regioni-pil.json"
+          git push
