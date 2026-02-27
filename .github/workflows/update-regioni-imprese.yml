@@ -1,0 +1,191 @@
+name: Update ISTAT Regioni Imprese
+
+on:
+  schedule:
+    - cron: "45 3 1 */3 *"
+  workflow_dispatch:
+
+jobs:
+  update-imprese:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests lxml
+
+      - name: Create Python script
+        run: |
+          cat << 'PYTHON' > script.py
+          import requests
+          from lxml import etree
+          import json
+          import time
+
+          # =========================
+          # CONFIG REGIONI (coerente con PIL e popolazione)
+          # =========================
+
+          regioni = {
+              "ITC1": ("01", "Piemonte"),
+              "ITC2": ("02", "Valle d'Aosta"),
+              "ITC3": ("07", "Liguria"),
+              "ITC4": ("03", "Lombardia"),
+              "ITDA": ("04", "Trentino-Alto Adige"),
+              "ITD3": ("05", "Veneto"),
+              "ITD4": ("06", "Friuli-Venezia Giulia"),
+              "ITD5": ("08", "Emilia-Romagna"),
+              "ITE1": ("09", "Toscana"),
+              "ITE2": ("10", "Umbria"),
+              "ITE3": ("11", "Marche"),
+              "ITE4": ("12", "Lazio"),
+              "ITF1": ("13", "Abruzzo"),
+              "ITF2": ("14", "Molise"),
+              "ITF3": ("15", "Campania"),
+              "ITF4": ("16", "Puglia"),
+              "ITF5": ("17", "Basilicata"),
+              "ITF6": ("18", "Calabria"),
+              "ITG1": ("19", "Sicilia"),
+              "ITG2": ("20", "Sardegna"),
+          }
+
+          nuts_list = "+".join(regioni.keys())
+
+          # =========================
+          # URL SDMX
+          # =========================
+
+          url = (
+              "https://esploradati.istat.it/SDMXWS/rest/data/"
+              "IT1,183_277_DF_DICA_ASIAUE1P_1,1.0/"
+              f"A.IT+{nuts_list}.AENTN.0010.TOTAL.TOT.9.9./"
+              "ALL?detail=dataonly"
+          )
+
+          # =========================
+          # FETCH ROBUSTO
+          # =========================
+
+          def fetch(url):
+              headers = {
+                  "User-Agent": "Mozilla/5.0",
+                  "Accept-Encoding": "gzip"
+              }
+              for i in range(5):
+                  try:
+                      print(f"Tentativo {i+1} download imprese...")
+                      r = requests.get(url, timeout=60, headers=headers)
+                      r.raise_for_status()
+                      return r.content
+                  except Exception as e:
+                      print("Errore:", e)
+                      time.sleep(5)
+              raise Exception("Errore persistente download ISTAT Imprese")
+
+          print("Download imprese attive regioni...")
+          xml_data = fetch(url)
+
+          root = etree.fromstring(xml_data)
+          ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
+
+          serie_regioni = {}
+          totale_italia = {}
+
+          for series in root.xpath("//g:Series", namespaces=ns):
+
+              ref_area = series.xpath(
+                  "./g:SeriesKey/g:Value[@id='REF_AREA']/@value",
+                  namespaces=ns
+              )
+
+              if not ref_area:
+                  continue
+
+              area = ref_area[0]
+
+              obs = series.xpath("./g:Obs", namespaces=ns)
+
+              dati_annuali = {}
+
+              for o in obs:
+                  anno = int(o.xpath("./g:ObsDimension/@value", namespaces=ns)[0])
+                  valore = int(o.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+                  dati_annuali[anno] = valore
+
+              if area == "IT":
+                  totale_italia = dati_annuali
+              elif area in regioni:
+                  serie_regioni[area] = dati_annuali
+
+          if not totale_italia:
+              raise Exception("Totale Italia non trovato nel dataset")
+
+          ultimo_anno = max(totale_italia.keys())
+          totale_ultimo = totale_italia[ultimo_anno]
+
+          dataset_temp = {}
+
+          for nuts, serie in serie_regioni.items():
+
+              codice, nome = regioni[nuts]
+
+              if ultimo_anno not in serie:
+                  continue
+
+              valore = serie[ultimo_anno]
+              quota = round((valore / totale_ultimo) * 100, 2)
+
+              dataset_temp[codice] = {
+                  "nome": nome,
+                  "anno_ultimo": ultimo_anno,
+                  "imprese_attive": valore,
+                  "quota_percentuale_nazionale": quota
+              }
+
+          # =========================
+          # RANKING
+          # =========================
+
+          ordinati = sorted(
+              dataset_temp.items(),
+              key=lambda x: x[1]["imprese_attive"],
+              reverse=True
+          )
+
+          dataset_finale = {}
+
+          for rank, (codice, dati) in enumerate(ordinati, start=1):
+              dati["rank_imprese"] = rank
+              dataset_finale[codice] = dati
+
+          dataset_finale = dict(sorted(dataset_finale.items()))
+
+          dataset_finale["IT"] = {
+              "nome": "Italia",
+              "anno_ultimo": ultimo_anno,
+              "imprese_attive": totale_ultimo
+          }
+
+          with open("regioni-imprese.json", "w", encoding="utf-8") as f:
+              json.dump(dataset_finale, f, ensure_ascii=False, indent=2)
+
+          print("regioni-imprese.json aggiornato correttamente")
+          PYTHON
+
+      - name: Run script
+        run: python script.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add regioni-imprese.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico regioni-imprese.json"
+          git push
