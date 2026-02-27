@@ -1,0 +1,157 @@
+name: Update Imprese Attive Regioni
+
+on:
+  schedule:
+    - cron: "0 4 1 * *"   # ogni mese alle 04:00
+  workflow_dispatch:
+
+jobs:
+  update-imprese:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Create Python script
+        run: |
+          cat << 'PYTHON' > script_imprese.py
+          import requests
+          import json
+          from datetime import datetime
+
+          # =========================
+          # CONFIG REGIONI
+          # =========================
+
+          regioni = {
+              "ITC1": ("01", "Piemonte"),
+              "ITC2": ("02", "Valle d'Aosta"),
+              "ITC4": ("03", "Lombardia"),
+              "ITDA": ("04", "Trentino-Alto Adige"),
+              "ITD3": ("05", "Veneto"),
+              "ITD4": ("06", "Friuli-Venezia Giulia"),
+              "ITC3": ("07", "Liguria"),
+              "ITD5": ("08", "Emilia-Romagna"),
+              "ITE1": ("09", "Toscana"),
+              "ITE2": ("10", "Umbria"),
+              "ITE3": ("11", "Marche"),
+              "ITE4": ("12", "Lazio"),
+              "ITF1": ("13", "Abruzzo"),
+              "ITF2": ("14", "Molise"),
+              "ITF3": ("15", "Campania"),
+              "ITF4": ("16", "Puglia"),
+              "ITF5": ("17", "Basilicata"),
+              "ITF6": ("18", "Calabria"),
+              "ITG1": ("19", "Sicilia"),
+              "ITG2": ("20", "Sardegna"),
+          }
+
+          # =========================
+          # DOWNLOAD DATASET JSON-STAT
+          # =========================
+
+          url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
+
+          print("Download dataset imprese attive...")
+          r = requests.get(url, timeout=60)
+          r.raise_for_status()
+          data = r.json()
+
+          # =========================
+          # PARSING JSON-STAT
+          # =========================
+
+          dimension = data["dimension"]
+
+          territori = dimension["Territorio"]["category"]["index"]
+          tempi = dimension["Tempo"]["category"]["index"]
+          settori = dimension["Settore"]["category"]["index"]
+
+          values = data["value"]
+
+          # ultimo mese disponibile
+          ultimo_tempo = list(tempi.keys())[-1]
+          tempo_index = list(tempi.keys()).index(ultimo_tempo)
+
+          # totale settore (ATECO totale)
+          settore_totale = list(settori.keys())[0]
+          settore_index = list(settori.keys()).index(settore_totale)
+
+          # funzione per recuperare valore corretto
+          def get_value(territorio_key):
+              t_index = list(territori.keys()).index(territorio_key)
+
+              # formula posizione JSON-stat
+              pos = (
+                  t_index * len(tempi) * len(settori)
+                  + tempo_index * len(settori)
+                  + settore_index
+              )
+
+              return values[pos]
+
+          dataset = {}
+
+          # totale Italia
+          totale_italia = get_value("IT")
+
+          for nuts, (codice, nome) in regioni.items():
+              valore = get_value(nuts)
+
+              dataset[codice] = {
+                  "nome": nome,
+                  "anno_ultimo": ultimo_tempo,
+                  "imprese_attive": int(valore),
+              }
+
+          # =========================
+          # CALCOLO QUOTE E RANK
+          # =========================
+
+          # quota %
+          for codice in dataset:
+              quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
+              dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
+
+          # ranking
+          ordinato = sorted(
+              dataset.items(),
+              key=lambda x: x[1]["imprese_attive"],
+              reverse=True
+          )
+
+          for rank, (codice, _) in enumerate(ordinato, start=1):
+              dataset[codice]["rank_imprese"] = rank
+
+          # ordina per codice
+          dataset = dict(sorted(dataset.items()))
+
+          # =========================
+          # SALVATAGGIO
+          # =========================
+
+          with open("imprese.json", "w", encoding="utf-8") as f:
+              json.dump(dataset, f, ensure_ascii=False, indent=2)
+
+          print("imprese.json aggiornato correttamente")
+          PYTHON
+
+      - name: Run script
+        run: python script_imprese.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add imprese.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico imprese.json"
+          git push
