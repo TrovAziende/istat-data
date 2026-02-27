@@ -28,7 +28,6 @@ jobs:
           from lxml import etree
           import json
           import time
-          from datetime import datetime
 
           # =========================
           # CONFIG REGIONI
@@ -57,17 +56,12 @@ jobs:
               "ITG2": ("20", "Sardegna", "sardegna", 24100),
           }
 
-          # =========================
-          # ANNO ULTIMO DISPONIBILE
-          # =========================
-
-          anno = datetime.now().year - 1
           nuts_list = "+".join(regioni.keys())
 
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
               "IT1,22_289_DF_DCIS_POPRES1_1,1.0/"
-              f"A.{nuts_list}.JAN.9.TOTAL.99/{anno}"
+              f"A.{nuts_list}.JAN.9.TOTAL.99/ALL"
               "?detail=dataonly"
           )
 
@@ -84,11 +78,7 @@ jobs:
               for i in range(5):
                   try:
                       print(f"Tentativo {i+1} download popolazione...")
-                      r = requests.get(
-                          url,
-                          timeout=60,
-                          headers=headers
-                      )
+                      r = requests.get(url, timeout=60, headers=headers)
                       r.raise_for_status()
                       return r.content
                   except Exception as e:
@@ -107,7 +97,7 @@ jobs:
           root = etree.fromstring(xml_data)
           ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
 
-          dataset = {}
+          dataset_temp = {}
 
           for series in root.xpath("//g:Series", namespaces=ns):
 
@@ -126,22 +116,49 @@ jobs:
 
               codice, nome, slug, superficie = regioni[nuts]
 
-              obs = series.xpath("./g:Obs/g:ObsValue/@value", namespaces=ns)
+              obs = series.xpath("./g:Obs", namespaces=ns)
 
-              popolazione = int(obs[0]) if obs else None
+              serie_annuale = {}
 
-              dataset[codice] = {
+              for o in obs:
+                  anno = o.xpath("./g:ObsDimension/@value", namespaces=ns)[0]
+                  valore = int(o.xpath("./g:ObsValue/@value", namespaces=ns)[0])
+                  serie_annuale[int(anno)] = valore
+
+              if not serie_annuale:
+                  continue
+
+              ultimo_anno = max(serie_annuale.keys())
+              popolazione = serie_annuale[ultimo_anno]
+
+              dataset_temp[codice] = {
                   "nome": nome,
                   "slug": slug,
                   "superficie_km2": superficie,
-                  "anno": anno,
+                  "anno": ultimo_anno,
                   "popolazione": popolazione
               }
 
-          dataset = dict(sorted(dataset.items()))
+          # =========================
+          # CALCOLO RANK POPOLAZIONE
+          # =========================
+
+          ordinati = sorted(
+              dataset_temp.items(),
+              key=lambda x: x[1]["popolazione"],
+              reverse=True
+          )
+
+          dataset_finale = {}
+
+          for rank, (codice, dati) in enumerate(ordinati, start=1):
+              dati["rank_popolazione"] = rank
+              dataset_finale[codice] = dati
+
+          dataset_finale = dict(sorted(dataset_finale.items()))
 
           with open("regioni.json", "w", encoding="utf-8") as f:
-              json.dump(dataset, f, ensure_ascii=False, indent=2)
+              json.dump(dataset_finale, f, ensure_ascii=False, indent=2)
 
           print("regioni.json aggiornato correttamente")
           PYTHON
