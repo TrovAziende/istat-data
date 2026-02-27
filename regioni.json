@@ -4,139 +4,139 @@
     "slug": "piemonte",
     "superficie_km2": 25387,
     "anno": 2025,
-    "popolazione": 656
+    "popolazione": 4328565
   },
   "02": {
     "nome": "Valle d'Aosta",
     "slug": "valle-daosta",
     "superficie_km2": 3263,
     "anno": 2025,
-    "popolazione": 19
+    "popolazione": 125653
   },
   "03": {
     "nome": "Lombardia",
     "slug": "lombardia",
     "superficie_km2": 23863,
     "anno": 2025,
-    "popolazione": 1427
+    "popolazione": 10010833
   },
   "04": {
     "nome": "Trentino-Alto Adige",
     "slug": "trentino-alto-adige",
     "superficie_km2": 13607,
     "anno": 2025,
-    "popolazione": 168
+    "popolazione": 1074034
   },
   "05": {
     "nome": "Veneto",
     "slug": "veneto",
     "superficie_km2": 18345,
     "anno": 2025,
-    "popolazione": 705
+    "popolazione": 4884590
   },
   "06": {
     "nome": "Friuli-Venezia Giulia",
     "slug": "friuli-venezia-giulia",
     "superficie_km2": 7924,
     "anno": 2025,
-    "popolazione": 273
+    "popolazione": 1210414
   },
   "07": {
     "nome": "Liguria",
     "slug": "liguria",
     "superficie_km2": 5416,
     "anno": 2025,
-    "popolazione": 349
+    "popolazione": 1532980
   },
   "08": {
     "nome": "Emilia-Romagna",
     "slug": "emilia-romagna",
     "superficie_km2": 22453,
     "anno": 2025,
-    "popolazione": 933
+    "popolazione": 4459453
   },
   "09": {
     "nome": "Toscana",
     "slug": "toscana",
     "superficie_km2": 22987,
     "anno": 2025,
-    "popolazione": 726
+    "popolazione": 3701343
   },
   "10": {
     "nome": "Umbria",
     "slug": "umbria",
     "superficie_km2": 8456,
     "anno": 2025,
-    "popolazione": 185
+    "popolazione": 873744
   },
   "11": {
     "nome": "Marche",
     "slug": "marche",
     "superficie_km2": 9366,
     "anno": 2025,
-    "popolazione": 278
+    "popolazione": 1520321
   },
   "12": {
     "nome": "Lazio",
     "slug": "lazio",
     "superficie_km2": 17232,
     "anno": 2025,
-    "popolazione": 776
+    "popolazione": 5773076
   },
   "13": {
     "nome": "Abruzzo",
     "slug": "abruzzo",
     "superficie_km2": 10831,
     "anno": 2025,
-    "popolazione": 230
+    "popolazione": 1300645
   },
   "14": {
     "nome": "Molise",
     "slug": "molise",
     "superficie_km2": 4460,
     "anno": 2025,
-    "popolazione": 59
+    "popolazione": 303790
   },
   "15": {
     "nome": "Campania",
     "slug": "campania",
     "superficie_km2": 13671,
     "anno": 2025,
-    "popolazione": 476
+    "popolazione": 5740291
   },
   "16": {
     "nome": "Puglia",
     "slug": "puglia",
     "superficie_km2": 19359,
     "anno": 2025,
-    "popolazione": 516
+    "popolazione": 3975528
   },
   "17": {
     "nome": "Basilicata",
     "slug": "basilicata",
     "superficie_km2": 9992,
     "anno": 2025,
-    "popolazione": 80
+    "popolazione": 558587
   },
   "18": {
     "nome": "Calabria",
     "slug": "calabria",
     "superficie_km2": 15080,
     "anno": 2025,
-    "popolazione": 259
+    "popolazione": 1912021
   },
   "19": {
     "nome": "Sicilia",
     "slug": "sicilia",
     "superficie_km2": 25711,
     "anno": 2025,
-    "popolazione": 579
+    "popolazione": 4908548
   },
   "20": {
     "nome": "Sardegna",
     "slug": "sardegna",
     "superficie_km2": 24100,
     "anno": 2025,
-    "popolazione": 291
+    "popolazione": 1622257
   }
 }
