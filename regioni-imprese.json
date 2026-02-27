@@ -1,0 +1,147 @@
+{
+  "01": {
+    "nome": "Piemonte",
+    "anno_ultimo": 2023,
+    "imprese_attive": 341513,
+    "quota_percentuale_nazionale": 7.24,
+    "rank_imprese": 6
+  },
+  "02": {
+    "nome": "Valle d'Aosta",
+    "anno_ultimo": 2023,
+    "imprese_attive": 11585,
+    "quota_percentuale_nazionale": 0.25,
+    "rank_imprese": 20
+  },
+  "03": {
+    "nome": "Lombardia",
+    "anno_ultimo": 2023,
+    "imprese_attive": 887845,
+    "quota_percentuale_nazionale": 18.83,
+    "rank_imprese": 1
+  },
+  "04": {
+    "nome": "Trentino-Alto Adige",
+    "anno_ultimo": 2023,
+    "imprese_attive": 92023,
+    "quota_percentuale_nazionale": 1.95,
+    "rank_imprese": 15
+  },
+  "05": {
+    "nome": "Veneto",
+    "anno_ultimo": 2023,
+    "imprese_attive": 413256,
+    "quota_percentuale_nazionale": 8.76,
+    "rank_imprese": 3
+  },
+  "06": {
+    "nome": "Friuli-Venezia Giulia",
+    "anno_ultimo": 2023,
+    "imprese_attive": 86767,
+    "quota_percentuale_nazionale": 1.84,
+    "rank_imprese": 16
+  },
+  "07": {
+    "nome": "Liguria",
+    "anno_ultimo": 2023,
+    "imprese_attive": 129438,
+    "quota_percentuale_nazionale": 2.74,
+    "rank_imprese": 11
+  },
+  "08": {
+    "nome": "Emilia-Romagna",
+    "anno_ultimo": 2023,
+    "imprese_attive": 383434,
+    "quota_percentuale_nazionale": 8.13,
+    "rank_imprese": 5
+  },
+  "09": {
+    "nome": "Toscana",
+    "anno_ultimo": 2023,
+    "imprese_attive": 336000,
+    "quota_percentuale_nazionale": 7.13,
+    "rank_imprese": 7
+  },
+  "10": {
+    "nome": "Umbria",
+    "anno_ultimo": 2023,
+    "imprese_attive": 69753,
+    "quota_percentuale_nazionale": 1.48,
+    "rank_imprese": 17
+  },
+  "11": {
+    "nome": "Marche",
+    "anno_ultimo": 2023,
+    "imprese_attive": 130440,
+    "quota_percentuale_nazionale": 2.77,
+    "rank_imprese": 10
+  },
+  "12": {
+    "nome": "Lazio",
+    "anno_ultimo": 2023,
+    "imprese_attive": 487286,
+    "quota_percentuale_nazionale": 10.33,
+    "rank_imprese": 2
+  },
+  "13": {
+    "nome": "Abruzzo",
+    "anno_ultimo": 2023,
+    "imprese_attive": 102858,
+    "quota_percentuale_nazionale": 2.18,
+    "rank_imprese": 14
+  },
+  "14": {
+    "nome": "Molise",
+    "anno_ultimo": 2023,
+    "imprese_attive": 21750,
+    "quota_percentuale_nazionale": 0.46,
+    "rank_imprese": 19
+  },
+  "15": {
+    "nome": "Campania",
+    "anno_ultimo": 2023,
+    "imprese_attive": 385180,
+    "quota_percentuale_nazionale": 8.17,
+    "rank_imprese": 4
+  },
+  "16": {
+    "nome": "Puglia",
+    "anno_ultimo": 2023,
+    "imprese_attive": 272380,
+    "quota_percentuale_nazionale": 5.78,
+    "rank_imprese": 9
+  },
+  "17": {
+    "nome": "Basilicata",
+    "anno_ultimo": 2023,
+    "imprese_attive": 37189,
+    "quota_percentuale_nazionale": 0.79,
+    "rank_imprese": 18
+  },
+  "18": {
+    "nome": "Calabria",
+    "anno_ultimo": 2023,
+    "imprese_attive": 117034,
+    "quota_percentuale_nazionale": 2.48,
+    "rank_imprese": 12
+  },
+  "19": {
+    "nome": "Sicilia",
+    "anno_ultimo": 2023,
+    "imprese_attive": 296807,
+    "quota_percentuale_nazionale": 6.29,
+    "rank_imprese": 8
+  },
+  "20": {
+    "nome": "Sardegna",
+    "anno_ultimo": 2023,
+    "imprese_attive": 113215,
+    "quota_percentuale_nazionale": 2.4,
+    "rank_imprese": 13
+  },
+  "IT": {
+    "nome": "Italia",
+    "anno_ultimo": 2023,
+    "imprese_attive": 4715753
+  }
+}
