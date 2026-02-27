@@ -30,7 +30,7 @@ jobs:
           import time
 
           # =========================
-          # CONFIG REGIONI
+          # CONFIG REGIONI (coerente con popolazione)
           # =========================
 
           regioni = {
@@ -58,12 +58,20 @@ jobs:
 
           nuts_list = "+".join(regioni.keys())
 
+          # =========================
+          # URL SDMX CORRETTO
+          # =========================
+
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
               "IT1,93_498_DF_DCCN_PILT_1,1.0/"
-              f"A.IT+{nuts_list}...N./"
+              f"A.IT+{nuts_list}..V.N./"
               "ALL?detail=dataonly"
           )
+
+          # =========================
+          # FETCH ROBUSTO
+          # =========================
 
           def fetch(url):
               headers = {
@@ -89,6 +97,10 @@ jobs:
 
           serie_regioni = {}
           pil_italia = {}
+
+          # =========================
+          # PARSING
+          # =========================
 
           for series in root.xpath("//g:Series", namespaces=ns):
 
@@ -116,8 +128,14 @@ jobs:
               elif area in regioni:
                   serie_regioni[area] = dati_annuali
 
+          if not pil_italia:
+              raise Exception("PIL Italia non trovato nel dataset")
+
           ultimo_anno = max(pil_italia.keys())
-          ultimi_5_anni = sorted([a for a in pil_italia.keys() if a <= ultimo_anno])[-5:]
+
+          # ultimi 5 anni dinamici
+          anni_ordinati = sorted(pil_italia.keys())
+          ultimi_5_anni = anni_ordinati[-5:]
 
           pil_italia_ultimo = pil_italia[ultimo_anno]
 
@@ -126,6 +144,9 @@ jobs:
           for nuts, serie in serie_regioni.items():
 
               codice = regioni[nuts]
+
+              if ultimo_anno not in serie:
+                  continue
 
               serie_filtrata = {
                   str(a): round(serie[a], 1)
@@ -142,6 +163,10 @@ jobs:
                   "serie_5_anni": serie_filtrata,
                   "quota_percentuale_nazionale": quota
               }
+
+          # =========================
+          # RANKING PIL
+          # =========================
 
           ordinati = sorted(
               dataset_temp.items(),
