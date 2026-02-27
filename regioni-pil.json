@@ -1,0 +1,262 @@
+{
+  "01": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 15165.0,
+    "serie_5_anni": {
+      "2019": 14441.8,
+      "2020": 12889.6,
+      "2021": 14163.6,
+      "2022": 15281.5,
+      "2023": 15165.0
+    },
+    "quota_percentuale_nazionale": 7.37,
+    "rank_pil": 5
+  },
+  "02": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 550.0,
+    "serie_5_anni": {
+      "2019": 512.3,
+      "2020": 459.6,
+      "2021": 482.2,
+      "2022": 529.2,
+      "2023": 550.0
+    },
+    "quota_percentuale_nazionale": 0.27,
+    "rank_pil": 20
+  },
+  "03": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 47570.8,
+    "serie_5_anni": {
+      "2019": 43417.6,
+      "2020": 39704.2,
+      "2021": 43921.1,
+      "2022": 47750.4,
+      "2023": 47570.8
+    },
+    "quota_percentuale_nazionale": 23.13,
+    "rank_pil": 1
+  },
+  "04": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 5558.8,
+    "serie_5_anni": {
+      "2019": 5066.0,
+      "2020": 4634.9,
+      "2021": 4968.9,
+      "2022": 5526.2,
+      "2023": 5558.8
+    },
+    "quota_percentuale_nazionale": 2.7,
+    "rank_pil": 10
+  },
+  "05": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 19038.6,
+    "serie_5_anni": {
+      "2019": 17822.5,
+      "2020": 15978.6,
+      "2021": 17477.4,
+      "2022": 19088.2,
+      "2023": 19038.6
+    },
+    "quota_percentuale_nazionale": 9.26,
+    "rank_pil": 3
+  },
+  "06": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 4336.4,
+    "serie_5_anni": {
+      "2019": 4115.5,
+      "2020": 3744.7,
+      "2021": 4101.0,
+      "2022": 4341.5,
+      "2023": 4336.4
+    },
+    "quota_percentuale_nazionale": 2.11,
+    "rank_pil": 13
+  },
+  "07": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 5192.4,
+    "serie_5_anni": {
+      "2019": 5150.7,
+      "2020": 4544.3,
+      "2021": 4969.4,
+      "2022": 5286.1,
+      "2023": 5192.4
+    },
+    "quota_percentuale_nazionale": 2.52,
+    "rank_pil": 11
+  },
+  "08": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 18640.8,
+    "serie_5_anni": {
+      "2019": 17338.8,
+      "2020": 15725.3,
+      "2021": 17420.8,
+      "2022": 18760.1,
+      "2023": 18640.8
+    },
+    "quota_percentuale_nazionale": 9.06,
+    "rank_pil": 4
+  },
+  "09": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 13464.4,
+    "serie_5_anni": {
+      "2019": 13101.8,
+      "2020": 11283.0,
+      "2021": 12340.6,
+      "2022": 13712.4,
+      "2023": 13464.4
+    },
+    "quota_percentuale_nazionale": 6.55,
+    "rank_pil": 6
+  },
+  "10": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 2529.0,
+    "serie_5_anni": {
+      "2019": 2417.2,
+      "2020": 2162.2,
+      "2021": 2356.3,
+      "2022": 2531.7,
+      "2023": 2529.0
+    },
+    "quota_percentuale_nazionale": 1.23,
+    "rank_pil": 17
+  },
+  "11": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 4824.8,
+    "serie_5_anni": {
+      "2019": 4509.4,
+      "2020": 4053.5,
+      "2021": 4398.7,
+      "2022": 4839.9,
+      "2023": 4824.8
+    },
+    "quota_percentuale_nazionale": 2.35,
+    "rank_pil": 12
+  },
+  "12": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 23379.6,
+    "serie_5_anni": {
+      "2019": 22165.4,
+      "2020": 20024.6,
+      "2021": 21044.7,
+      "2022": 23098.0,
+      "2023": 23379.6
+    },
+    "quota_percentuale_nazionale": 11.37,
+    "rank_pil": 2
+  },
+  "13": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 3798.6,
+    "serie_5_anni": {
+      "2019": 3537.2,
+      "2020": 3164.4,
+      "2021": 3411.5,
+      "2022": 3783.3,
+      "2023": 3798.6
+    },
+    "quota_percentuale_nazionale": 1.85,
+    "rank_pil": 15
+  },
+  "14": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 746.8,
+    "serie_5_anni": {
+      "2019": 704.0,
+      "2020": 628.2,
+      "2021": 687.9,
+      "2022": 745.2,
+      "2023": 746.8
+    },
+    "quota_percentuale_nazionale": 0.36,
+    "rank_pil": 19
+  },
+  "15": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 12414.6,
+    "serie_5_anni": {
+      "2019": 11615.4,
+      "2020": 10480.6,
+      "2021": 11397.3,
+      "2022": 12483.7,
+      "2023": 12414.6
+    },
+    "quota_percentuale_nazionale": 6.04,
+    "rank_pil": 7
+  },
+  "16": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 8890.1,
+    "serie_5_anni": {
+      "2019": 8023.7,
+      "2020": 7335.8,
+      "2021": 8008.2,
+      "2022": 8842.2,
+      "2023": 8890.1
+    },
+    "quota_percentuale_nazionale": 4.32,
+    "rank_pil": 9
+  },
+  "17": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 1455.3,
+    "serie_5_anni": {
+      "2019": 1315.4,
+      "2020": 1157.7,
+      "2021": 1266.7,
+      "2022": 1385.6,
+      "2023": 1455.3
+    },
+    "quota_percentuale_nazionale": 0.71,
+    "rank_pil": 18
+  },
+  "18": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 3609.6,
+    "serie_5_anni": {
+      "2019": 3430.6,
+      "2020": 3086.6,
+      "2021": 3375.3,
+      "2022": 3600.5,
+      "2023": 3609.6
+    },
+    "quota_percentuale_nazionale": 1.75,
+    "rank_pil": 16
+  },
+  "19": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 10509.6,
+    "serie_5_anni": {
+      "2019": 9359.7,
+      "2020": 8499.3,
+      "2021": 9257.8,
+      "2022": 10479.3,
+      "2023": 10509.6
+    },
+    "quota_percentuale_nazionale": 5.11,
+    "rank_pil": 8
+  },
+  "20": {
+    "anno_ultimo": 2023,
+    "valore_milioni": 4006.2,
+    "serie_5_anni": {
+      "2019": 3755.9,
+      "2020": 3378.9,
+      "2021": 3642.5,
+      "2022": 4046.8,
+      "2023": 4006.2
+    },
+    "quota_percentuale_nazionale": 1.95,
+    "rank_pil": 14
+  }
+}
