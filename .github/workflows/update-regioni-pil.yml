@@ -34,33 +34,29 @@ jobs:
           # =========================
 
           regioni = {
-              "ITC1": "01",
-              "ITC2": "02",
-              "ITC3": "07",
-              "ITC4": "03",
-              "ITDA": "04",
-              "ITD3": "05",
-              "ITD4": "06",
-              "ITD5": "08",
-              "ITE1": "09",
-              "ITE2": "10",
-              "ITE3": "11",
-              "ITE4": "12",
-              "ITF1": "13",
-              "ITF2": "14",
-              "ITF3": "15",
-              "ITF4": "16",
-              "ITF5": "17",
-              "ITF6": "18",
-              "ITG1": "19",
-              "ITG2": "20",
+              "ITC1": ("01", "Piemonte"),
+              "ITC2": ("02", "Valle d'Aosta"),
+              "ITC3": ("07", "Liguria"),
+              "ITC4": ("03", "Lombardia"),
+              "ITDA": ("04", "Trentino-Alto Adige"),
+              "ITD3": ("05", "Veneto"),
+              "ITD4": ("06", "Friuli-Venezia Giulia"),
+              "ITD5": ("08", "Emilia-Romagna"),
+              "ITE1": ("09", "Toscana"),
+              "ITE2": ("10", "Umbria"),
+              "ITE3": ("11", "Marche"),
+              "ITE4": ("12", "Lazio"),
+              "ITF1": ("13", "Abruzzo"),
+              "ITF2": ("14", "Molise"),
+              "ITF3": ("15", "Campania"),
+              "ITF4": ("16", "Puglia"),
+              "ITF5": ("17", "Basilicata"),
+              "ITF6": ("18", "Calabria"),
+              "ITG1": ("19", "Sicilia"),
+              "ITG2": ("20", "Sardegna"),
           }
 
           nuts_list = "+".join(regioni.keys())
-
-          # =========================
-          # URL SDMX CORRETTO
-          # =========================
 
           url = (
               "https://esploradati.istat.it/SDMXWS/rest/data/"
@@ -99,7 +95,7 @@ jobs:
           pil_italia = {}
 
           # =========================
-          # PARSING
+          # PARSING CON FILTRO EDITION
           # =========================
 
           for series in root.xpath("//g:Series", namespaces=ns):
@@ -109,18 +105,19 @@ jobs:
                   namespaces=ns
               )
 
-              if not ref_area:
-                  continue
-
-              area = ref_area[0]
-
               edition = series.xpath(
                   "./g:SeriesKey/g:Value[@id='EDITION']/@value",
                   namespaces=ns
               )
-              
-              if not edition or edition[0] != "2025M12":
+
+              if not ref_area or not edition:
                   continue
+
+              # prendiamo solo edizione completa più recente
+              if edition[0] != "2025M12":
+                  continue
+
+              area = ref_area[0]
 
               obs = series.xpath("./g:Obs", namespaces=ns)
 
@@ -140,8 +137,6 @@ jobs:
               raise Exception("PIL Italia non trovato nel dataset")
 
           ultimo_anno = max(pil_italia.keys())
-
-          # ultimi 5 anni dinamici
           anni_ordinati = sorted(pil_italia.keys())
           ultimi_5_anni = anni_ordinati[-5:]
 
@@ -151,7 +146,7 @@ jobs:
 
           for nuts, serie in serie_regioni.items():
 
-              codice = regioni[nuts]
+              codice, nome = regioni[nuts]
 
               if ultimo_anno not in serie:
                   continue
@@ -166,6 +161,7 @@ jobs:
               quota = round((valore_ultimo / pil_italia_ultimo) * 100, 2)
 
               dataset_temp[codice] = {
+                  "nome": nome,
                   "anno_ultimo": ultimo_anno,
                   "valore_milioni": valore_ultimo,
                   "serie_5_anni": serie_filtrata,
@@ -189,6 +185,13 @@ jobs:
               dataset_finale[codice] = dati
 
           dataset_finale = dict(sorted(dataset_finale.items()))
+
+          # aggiungiamo Italia totale per completezza
+          dataset_finale["IT"] = {
+              "nome": "Italia",
+              "anno_ultimo": ultimo_anno,
+              "valore_milioni": round(pil_italia_ultimo, 1)
+          }
 
           with open("regioni-pil.json", "w", encoding="utf-8") as f:
               json.dump(dataset_finale, f, ensure_ascii=False, indent=2)
