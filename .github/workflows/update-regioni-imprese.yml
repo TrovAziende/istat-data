@@ -2,7 +2,7 @@ name: Update Imprese Attive Regioni
 
 on:
   schedule:
-    - cron: "0 4 1 * *"   # ogni mese alle 04:00
+    - cron: "0 4 1 * *"
   workflow_dispatch:
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
           import json
 
           # =========================
-          # CONFIG REGIONI (NUTS2)
+          # CONFIG REGIONI
           # =========================
 
           regioni = {
@@ -55,7 +55,7 @@ jobs:
           }
 
           # =========================
-          # DOWNLOAD DATASET JSON-STAT
+          # DOWNLOAD
           # =========================
 
           url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
@@ -65,52 +65,55 @@ jobs:
           r.raise_for_status()
           data = r.json()
 
-          # =========================
-          # PARSING JSON-STAT
-          # =========================
-
           dimension = data["dimension"]
-          dim_ids = dimension["id"]      # ordine reale dimensioni
-          dim_sizes = dimension["size"]  # dimensioni ufficiali
           values = data["value"]
 
-          # Assumiamo ordine: GEO, SETTORE, TEMPO
-          geo_dim = dim_ids[0]
-          settore_dim = dim_ids[1]
-          tempo_dim = dim_ids[2]
+          # =========================
+          # IDENTIFICAZIONE DIMENSIONI
+          # =========================
+
+          dim_names = list(dimension.keys())
+
+          # individuiamo le dimensioni corrette cercando parole chiave
+          geo_dim = next(d for d in dim_names if "Terr" in d or "GEO" in d or "Geo" in d)
+          tempo_dim = next(d for d in dim_names if "Tempo" in d or "TIME" in d or "Time" in d)
+          settore_dim = next(d for d in dim_names if d not in [geo_dim, tempo_dim])
 
           geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
-          settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
           tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
+          settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
+
+          size_geo = len(geo_keys)
+          size_settore = len(settore_keys)
+          size_tempo = len(tempo_keys)
 
           # =========================
-          # ULTIMO MESE DISPONIBILE
+          # ULTIMO MESE
           # =========================
 
           ultimo_tempo = tempo_keys[-1]
           tempo_index = tempo_keys.index(ultimo_tempo)
 
-          # settore totale (primo indice)
+          # settore totale = primo indice
           settore_index = 0
 
           # =========================
-          # FUNZIONE CALCOLO POSIZIONE
+          # CALCOLO POSIZIONE JSON-STAT
           # =========================
 
           def get_value(geo_key):
               geo_index = geo_keys.index(geo_key)
 
-              # formula JSON-stat (row-major)
               pos = (
-                  geo_index * dim_sizes[1] * dim_sizes[2]
-                  + settore_index * dim_sizes[2]
+                  geo_index * size_settore * size_tempo
+                  + settore_index * size_tempo
                   + tempo_index
               )
 
               return values[pos]
 
           # =========================
-          # TOTALE ITALIA
+          # COSTRUZIONE DATASET
           # =========================
 
           totale_italia = get_value("IT")
@@ -126,18 +129,12 @@ jobs:
                   "imprese_attive": int(valore),
               }
 
-          # =========================
-          # CALCOLO QUOTE %
-          # =========================
-
+          # quota %
           for codice in dataset:
               quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
               dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
 
-          # =========================
-          # CALCOLO RANKING
-          # =========================
-
+          # ranking
           ordinato = sorted(
               dataset.items(),
               key=lambda x: x[1]["imprese_attive"],
@@ -147,11 +144,10 @@ jobs:
           for rank, (codice, _) in enumerate(ordinato, start=1):
               dataset[codice]["rank_imprese"] = rank
 
-          # ordina per codice regione
           dataset = dict(sorted(dataset.items()))
 
           # =========================
-          # SALVATAGGIO FILE
+          # SALVATAGGIO
           # =========================
 
           with open("imprese.json", "w", encoding="utf-8") as f:
