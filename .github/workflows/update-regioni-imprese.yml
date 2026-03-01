@@ -28,7 +28,7 @@ jobs:
           import json
 
           # =========================
-          # CONFIG REGIONI (codici NUTS2)
+          # CONFIG REGIONI
           # =========================
 
           regioni = {
@@ -64,19 +64,16 @@ jobs:
           dimension = data["dimension"]
           values = data["value"]
 
-          metric_keys = dimension["metric"]["category"]["index"]
           geo_keys = dimension["geo"]["category"]["index"]
           ateco_keys = dimension["ateco2025"]["category"]["index"]
           time_keys = dimension["time"]["category"]["index"]
 
-          size_metric = len(metric_keys)
           size_geo = len(geo_keys)
           size_ateco = len(ateco_keys)
           size_time = len(time_keys)
 
-          metric_index = 0  # unico indicatore
           ateco_index = ateco_keys.index("TOTAL")
-          time_index = size_time - 1  # ultimo mese
+          time_index = size_time - 1
 
           ultimo_label = dimension["time"]["category"]["label"][time_keys[time_index]]
 
@@ -84,8 +81,7 @@ jobs:
               geo_index = geo_keys.index(geo_code)
 
               pos = (
-                  metric_index * (size_geo * size_ateco * size_time)
-                  + geo_index * (size_ateco * size_time)
+                  geo_index * (size_ateco * size_time)
                   + ateco_index * size_time
                   + time_index
               )
