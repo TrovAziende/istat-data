@@ -26,10 +26,9 @@ jobs:
           cat << 'PYTHON' > script_imprese.py
           import requests
           import json
-          from datetime import datetime
 
           # =========================
-          # CONFIG REGIONI
+          # CONFIG REGIONI (NUTS2)
           # =========================
 
           regioni = {
@@ -71,38 +70,52 @@ jobs:
           # =========================
 
           dimension = data["dimension"]
-
-          territori = dimension["Territorio"]["category"]["index"]
-          tempi = dimension["Tempo"]["category"]["index"]
-          settori = dimension["Settore"]["category"]["index"]
-
+          dim_ids = dimension["id"]      # ordine reale dimensioni
+          dim_sizes = dimension["size"]  # dimensioni ufficiali
           values = data["value"]
 
-          # ultimo mese disponibile
-          ultimo_tempo = list(tempi.keys())[-1]
-          tempo_index = list(tempi.keys()).index(ultimo_tempo)
+          # Assumiamo ordine: GEO, SETTORE, TEMPO
+          geo_dim = dim_ids[0]
+          settore_dim = dim_ids[1]
+          tempo_dim = dim_ids[2]
 
-          # totale settore (ATECO totale)
-          settore_totale = list(settori.keys())[0]
-          settore_index = list(settori.keys()).index(settore_totale)
+          geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
+          settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
+          tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
 
-          # funzione per recuperare valore corretto
-          def get_value(territorio_key):
-              t_index = list(territori.keys()).index(territorio_key)
+          # =========================
+          # ULTIMO MESE DISPONIBILE
+          # =========================
 
-              # formula posizione JSON-stat
+          ultimo_tempo = tempo_keys[-1]
+          tempo_index = tempo_keys.index(ultimo_tempo)
+
+          # settore totale (primo indice)
+          settore_index = 0
+
+          # =========================
+          # FUNZIONE CALCOLO POSIZIONE
+          # =========================
+
+          def get_value(geo_key):
+              geo_index = geo_keys.index(geo_key)
+
+              # formula JSON-stat (row-major)
               pos = (
-                  t_index * len(tempi) * len(settori)
-                  + tempo_index * len(settori)
-                  + settore_index
+                  geo_index * dim_sizes[1] * dim_sizes[2]
+                  + settore_index * dim_sizes[2]
+                  + tempo_index
               )
 
               return values[pos]
 
-          dataset = {}
+          # =========================
+          # TOTALE ITALIA
+          # =========================
 
-          # totale Italia
           totale_italia = get_value("IT")
+
+          dataset = {}
 
           for nuts, (codice, nome) in regioni.items():
               valore = get_value(nuts)
@@ -114,15 +127,17 @@ jobs:
               }
 
           # =========================
-          # CALCOLO QUOTE E RANK
+          # CALCOLO QUOTE %
           # =========================
 
-          # quota %
           for codice in dataset:
               quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
               dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
 
-          # ranking
+          # =========================
+          # CALCOLO RANKING
+          # =========================
+
           ordinato = sorted(
               dataset.items(),
               key=lambda x: x[1]["imprese_attive"],
@@ -132,11 +147,11 @@ jobs:
           for rank, (codice, _) in enumerate(ordinato, start=1):
               dataset[codice]["rank_imprese"] = rank
 
-          # ordina per codice
+          # ordina per codice regione
           dataset = dict(sorted(dataset.items()))
 
           # =========================
-          # SALVATAGGIO
+          # SALVATAGGIO FILE
           # =========================
 
           with open("imprese.json", "w", encoding="utf-8") as f:
