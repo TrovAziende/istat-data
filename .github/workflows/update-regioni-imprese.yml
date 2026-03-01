@@ -1,191 +1,111 @@
-name: Update ISTAT Regioni Imprese
+import requests
+import json
 
-on:
-  schedule:
-    - cron: "45 3 1 */3 *"
-  workflow_dispatch:
+# =========================
+# CONFIG REGIONI
+# =========================
 
-jobs:
-  update-imprese:
-    runs-on: ubuntu-latest
+regioni = {
+    "ITC1": ("01", "Piemonte"),
+    "ITC2": ("02", "Valle d'Aosta"),
+    "ITC4": ("03", "Lombardia"),
+    "ITDA": ("04", "Trentino-Alto Adige"),
+    "ITD3": ("05", "Veneto"),
+    "ITD4": ("06", "Friuli-Venezia Giulia"),
+    "ITC3": ("07", "Liguria"),
+    "ITD5": ("08", "Emilia-Romagna"),
+    "ITE1": ("09", "Toscana"),
+    "ITE2": ("10", "Umbria"),
+    "ITE3": ("11", "Marche"),
+    "ITE4": ("12", "Lazio"),
+    "ITF1": ("13", "Abruzzo"),
+    "ITF2": ("14", "Molise"),
+    "ITF3": ("15", "Campania"),
+    "ITF4": ("16", "Puglia"),
+    "ITF5": ("17", "Basilicata"),
+    "ITF6": ("18", "Calabria"),
+    "ITG1": ("19", "Sicilia"),
+    "ITG2": ("20", "Sardegna"),
+}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+# =========================
+# DOWNLOAD
+# =========================
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
 
-      - name: Install dependencies
-        run: pip install requests lxml
+print("Download dataset imprese attive...")
+r = requests.get(url, timeout=60)
+r.raise_for_status()
+data = r.json()
 
-      - name: Create Python script
-        run: |
-          cat << 'PYTHON' > script.py
-          import requests
-          from lxml import etree
-          import json
-          import time
+dimension = data["dimension"]
+dim_ids = dimension["id"]        # ordine reale dimensioni
+dim_sizes = dimension["size"]    # dimensioni
 
-          # =========================
-          # CONFIG REGIONI (coerente con PIL e popolazione)
-          # =========================
+values = data["value"]
 
-          regioni = {
-              "ITC1": ("01", "Piemonte"),
-              "ITC2": ("02", "Valle d'Aosta"),
-              "ITC3": ("07", "Liguria"),
-              "ITC4": ("03", "Lombardia"),
-              "ITDA": ("04", "Trentino-Alto Adige"),
-              "ITD3": ("05", "Veneto"),
-              "ITD4": ("06", "Friuli-Venezia Giulia"),
-              "ITD5": ("08", "Emilia-Romagna"),
-              "ITE1": ("09", "Toscana"),
-              "ITE2": ("10", "Umbria"),
-              "ITE3": ("11", "Marche"),
-              "ITE4": ("12", "Lazio"),
-              "ITF1": ("13", "Abruzzo"),
-              "ITF2": ("14", "Molise"),
-              "ITF3": ("15", "Campania"),
-              "ITF4": ("16", "Puglia"),
-              "ITF5": ("17", "Basilicata"),
-              "ITF6": ("18", "Calabria"),
-              "ITG1": ("19", "Sicilia"),
-              "ITG2": ("20", "Sardegna"),
-          }
+# Recupero nomi reali dimensioni
+geo_dim = dim_ids[0]
+settore_dim = dim_ids[1]
+tempo_dim = dim_ids[2]
 
-          nuts_list = "+".join(regioni.keys())
+geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
+settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
+tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
 
-          # =========================
-          # URL SDMX
-          # =========================
+# ultimo mese disponibile
+ultimo_tempo = tempo_keys[-1]
+tempo_index = tempo_keys.index(ultimo_tempo)
 
-          url = (
-              "https://esploradati.istat.it/SDMXWS/rest/data/"
-              "IT1,183_277_DF_DICA_ASIAUE1P_1,1.0/"
-              f"A.IT+{nuts_list}.AENTN.0010.TOTAL.TOT.9.9./"
-              "ALL?detail=dataonly"
-          )
+# settore totale (primo indice)
+settore_index = 0
 
-          # =========================
-          # FETCH ROBUSTO
-          # =========================
+# funzione robusta calcolo posizione JSON-stat
+def get_value(geo_key):
+    geo_index = geo_keys.index(geo_key)
 
-          def fetch(url):
-              headers = {
-                  "User-Agent": "Mozilla/5.0",
-                  "Accept-Encoding": "gzip"
-              }
-              for i in range(5):
-                  try:
-                      print(f"Tentativo {i+1} download imprese...")
-                      r = requests.get(url, timeout=60, headers=headers)
-                      r.raise_for_status()
-                      return r.content
-                  except Exception as e:
-                      print("Errore:", e)
-                      time.sleep(5)
-              raise Exception("Errore persistente download ISTAT Imprese")
+    # formula ufficiale JSON-stat (row-major order)
+    pos = (
+        geo_index * dim_sizes[1] * dim_sizes[2]
+        + settore_index * dim_sizes[2]
+        + tempo_index
+    )
 
-          print("Download imprese attive regioni...")
-          xml_data = fetch(url)
+    return values[pos]
 
-          root = etree.fromstring(xml_data)
-          ns = {"g": "http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic"}
+# totale Italia
+totale_italia = get_value("IT")
 
-          serie_regioni = {}
-          totale_italia = {}
+dataset = {}
 
-          for series in root.xpath("//g:Series", namespaces=ns):
+for nuts, (codice, nome) in regioni.items():
+    valore = get_value(nuts)
 
-              ref_area = series.xpath(
-                  "./g:SeriesKey/g:Value[@id='REF_AREA']/@value",
-                  namespaces=ns
-              )
+    dataset[codice] = {
+        "nome": nome,
+        "anno_ultimo": ultimo_tempo,
+        "imprese_attive": int(valore),
+    }
 
-              if not ref_area:
-                  continue
+# quote %
+for codice in dataset:
+    quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
+    dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
 
-              area = ref_area[0]
+# ranking
+ordinato = sorted(
+    dataset.items(),
+    key=lambda x: x[1]["imprese_attive"],
+    reverse=True
+)
 
-              obs = series.xpath("./g:Obs", namespaces=ns)
+for rank, (codice, _) in enumerate(ordinato, start=1):
+    dataset[codice]["rank_imprese"] = rank
 
-              dati_annuali = {}
+dataset = dict(sorted(dataset.items()))
 
-              for o in obs:
-                  anno = int(o.xpath("./g:ObsDimension/@value", namespaces=ns)[0])
-                  valore = int(o.xpath("./g:ObsValue/@value", namespaces=ns)[0])
-                  dati_annuali[anno] = valore
+with open("imprese.json", "w", encoding="utf-8") as f:
+    json.dump(dataset, f, ensure_ascii=False, indent=2)
 
-              if area == "IT":
-                  totale_italia = dati_annuali
-              elif area in regioni:
-                  serie_regioni[area] = dati_annuali
-
-          if not totale_italia:
-              raise Exception("Totale Italia non trovato nel dataset")
-
-          ultimo_anno = max(totale_italia.keys())
-          totale_ultimo = totale_italia[ultimo_anno]
-
-          dataset_temp = {}
-
-          for nuts, serie in serie_regioni.items():
-
-              codice, nome = regioni[nuts]
-
-              if ultimo_anno not in serie:
-                  continue
-
-              valore = serie[ultimo_anno]
-              quota = round((valore / totale_ultimo) * 100, 2)
-
-              dataset_temp[codice] = {
-                  "nome": nome,
-                  "anno_ultimo": ultimo_anno,
-                  "imprese_attive": valore,
-                  "quota_percentuale_nazionale": quota
-              }
-
-          # =========================
-          # RANKING
-          # =========================
-
-          ordinati = sorted(
-              dataset_temp.items(),
-              key=lambda x: x[1]["imprese_attive"],
-              reverse=True
-          )
-
-          dataset_finale = {}
-
-          for rank, (codice, dati) in enumerate(ordinati, start=1):
-              dati["rank_imprese"] = rank
-              dataset_finale[codice] = dati
-
-          dataset_finale = dict(sorted(dataset_finale.items()))
-
-          dataset_finale["IT"] = {
-              "nome": "Italia",
-              "anno_ultimo": ultimo_anno,
-              "imprese_attive": totale_ultimo
-          }
-
-          with open("regioni-imprese.json", "w", encoding="utf-8") as f:
-              json.dump(dataset_finale, f, ensure_ascii=False, indent=2)
-
-          print("regioni-imprese.json aggiornato correttamente")
-          PYTHON
-
-      - name: Run script
-        run: python script.py
-
-      - name: Commit and push if changed
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add regioni-imprese.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico regioni-imprese.json"
-          git push
+print("imprese.json aggiornato correttamente")
