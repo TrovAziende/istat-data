@@ -28,22 +28,22 @@ jobs:
           import json
 
           # =========================
-          # CONFIG REGIONI
+          # CONFIG REGIONI (codici NUTS2)
           # =========================
 
           regioni = {
               "ITC1": ("01", "Piemonte"),
               "ITC2": ("02", "Valle d'Aosta"),
               "ITC4": ("03", "Lombardia"),
-              "ITDA": ("04", "Trentino-Alto Adige"),
-              "ITD3": ("05", "Veneto"),
-              "ITD4": ("06", "Friuli-Venezia Giulia"),
+              "ITH1_H2": ("04", "Trentino-Alto Adige"),
+              "ITH3": ("05", "Veneto"),
+              "ITH4": ("06", "Friuli-Venezia Giulia"),
               "ITC3": ("07", "Liguria"),
-              "ITD5": ("08", "Emilia-Romagna"),
-              "ITE1": ("09", "Toscana"),
-              "ITE2": ("10", "Umbria"),
-              "ITE3": ("11", "Marche"),
-              "ITE4": ("12", "Lazio"),
+              "ITH5": ("08", "Emilia-Romagna"),
+              "ITI1": ("09", "Toscana"),
+              "ITI2": ("10", "Umbria"),
+              "ITI3": ("11", "Marche"),
+              "ITI4": ("12", "Lazio"),
               "ITF1": ("13", "Abruzzo"),
               "ITF2": ("14", "Molise"),
               "ITF3": ("15", "Campania"),
@@ -53,10 +53,6 @@ jobs:
               "ITG1": ("19", "Sicilia"),
               "ITG2": ("20", "Sardegna"),
           }
-
-          # =========================
-          # DOWNLOAD
-          # =========================
 
           url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
 
@@ -68,53 +64,33 @@ jobs:
           dimension = data["dimension"]
           values = data["value"]
 
-          # =========================
-          # IDENTIFICAZIONE DIMENSIONI
-          # =========================
+          metric_keys = dimension["metric"]["category"]["index"]
+          geo_keys = dimension["geo"]["category"]["index"]
+          ateco_keys = dimension["ateco2025"]["category"]["index"]
+          time_keys = dimension["time"]["category"]["index"]
 
-          dim_names = list(dimension.keys())
-
-          # individuiamo le dimensioni corrette cercando parole chiave
-          geo_dim = next(d for d in dim_names if "Terr" in d or "GEO" in d or "Geo" in d)
-          tempo_dim = next(d for d in dim_names if "Tempo" in d or "TIME" in d or "Time" in d)
-          settore_dim = next(d for d in dim_names if d not in [geo_dim, tempo_dim])
-
-          geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
-          tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
-          settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
-
+          size_metric = len(metric_keys)
           size_geo = len(geo_keys)
-          size_settore = len(settore_keys)
-          size_tempo = len(tempo_keys)
+          size_ateco = len(ateco_keys)
+          size_time = len(time_keys)
 
-          # =========================
-          # ULTIMO MESE
-          # =========================
+          metric_index = 0  # unico indicatore
+          ateco_index = ateco_keys.index("TOTAL")
+          time_index = size_time - 1  # ultimo mese
 
-          ultimo_tempo = tempo_keys[-1]
-          tempo_index = tempo_keys.index(ultimo_tempo)
+          ultimo_label = dimension["time"]["category"]["label"][time_keys[time_index]]
 
-          # settore totale = primo indice
-          settore_index = 0
-
-          # =========================
-          # CALCOLO POSIZIONE JSON-STAT
-          # =========================
-
-          def get_value(geo_key):
-              geo_index = geo_keys.index(geo_key)
+          def get_value(geo_code):
+              geo_index = geo_keys.index(geo_code)
 
               pos = (
-                  geo_index * size_settore * size_tempo
-                  + settore_index * size_tempo
-                  + tempo_index
+                  metric_index * (size_geo * size_ateco * size_time)
+                  + geo_index * (size_ateco * size_time)
+                  + ateco_index * size_time
+                  + time_index
               )
 
               return values[pos]
-
-          # =========================
-          # COSTRUZIONE DATASET
-          # =========================
 
           totale_italia = get_value("IT")
 
@@ -125,7 +101,7 @@ jobs:
 
               dataset[codice] = {
                   "nome": nome,
-                  "anno_ultimo": ultimo_tempo,
+                  "anno_ultimo": ultimo_label,
                   "imprese_attive": int(valore),
               }
 
@@ -145,10 +121,6 @@ jobs:
               dataset[codice]["rank_imprese"] = rank
 
           dataset = dict(sorted(dataset.items()))
-
-          # =========================
-          # SALVATAGGIO
-          # =========================
 
           with open("imprese.json", "w", encoding="utf-8") as f:
               json.dump(dataset, f, ensure_ascii=False, indent=2)
