@@ -1,111 +1,172 @@
-import requests
-import json
+name: Update Imprese Attive Regioni
 
-# =========================
-# CONFIG REGIONI
-# =========================
+on:
+  schedule:
+    - cron: "0 4 1 * *"   # ogni mese alle 04:00
+  workflow_dispatch:
 
-regioni = {
-    "ITC1": ("01", "Piemonte"),
-    "ITC2": ("02", "Valle d'Aosta"),
-    "ITC4": ("03", "Lombardia"),
-    "ITDA": ("04", "Trentino-Alto Adige"),
-    "ITD3": ("05", "Veneto"),
-    "ITD4": ("06", "Friuli-Venezia Giulia"),
-    "ITC3": ("07", "Liguria"),
-    "ITD5": ("08", "Emilia-Romagna"),
-    "ITE1": ("09", "Toscana"),
-    "ITE2": ("10", "Umbria"),
-    "ITE3": ("11", "Marche"),
-    "ITE4": ("12", "Lazio"),
-    "ITF1": ("13", "Abruzzo"),
-    "ITF2": ("14", "Molise"),
-    "ITF3": ("15", "Campania"),
-    "ITF4": ("16", "Puglia"),
-    "ITF5": ("17", "Basilicata"),
-    "ITF6": ("18", "Calabria"),
-    "ITG1": ("19", "Sicilia"),
-    "ITG2": ("20", "Sardegna"),
-}
+jobs:
+  update-imprese:
+    runs-on: ubuntu-latest
 
-# =========================
-# DOWNLOAD
-# =========================
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-print("Download dataset imprese attive...")
-r = requests.get(url, timeout=60)
-r.raise_for_status()
-data = r.json()
+      - name: Install dependencies
+        run: pip install requests
 
-dimension = data["dimension"]
-dim_ids = dimension["id"]        # ordine reale dimensioni
-dim_sizes = dimension["size"]    # dimensioni
+      - name: Create Python script
+        run: |
+          cat << 'PYTHON' > script_imprese.py
+          import requests
+          import json
 
-values = data["value"]
+          # =========================
+          # CONFIG REGIONI (NUTS2)
+          # =========================
 
-# Recupero nomi reali dimensioni
-geo_dim = dim_ids[0]
-settore_dim = dim_ids[1]
-tempo_dim = dim_ids[2]
+          regioni = {
+              "ITC1": ("01", "Piemonte"),
+              "ITC2": ("02", "Valle d'Aosta"),
+              "ITC4": ("03", "Lombardia"),
+              "ITDA": ("04", "Trentino-Alto Adige"),
+              "ITD3": ("05", "Veneto"),
+              "ITD4": ("06", "Friuli-Venezia Giulia"),
+              "ITC3": ("07", "Liguria"),
+              "ITD5": ("08", "Emilia-Romagna"),
+              "ITE1": ("09", "Toscana"),
+              "ITE2": ("10", "Umbria"),
+              "ITE3": ("11", "Marche"),
+              "ITE4": ("12", "Lazio"),
+              "ITF1": ("13", "Abruzzo"),
+              "ITF2": ("14", "Molise"),
+              "ITF3": ("15", "Campania"),
+              "ITF4": ("16", "Puglia"),
+              "ITF5": ("17", "Basilicata"),
+              "ITF6": ("18", "Calabria"),
+              "ITG1": ("19", "Sicilia"),
+              "ITG2": ("20", "Sardegna"),
+          }
 
-geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
-settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
-tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
+          # =========================
+          # DOWNLOAD DATASET JSON-STAT
+          # =========================
 
-# ultimo mese disponibile
-ultimo_tempo = tempo_keys[-1]
-tempo_index = tempo_keys.index(ultimo_tempo)
+          url = "https://opendata.marche.camcom.it/data/Stock-Imprese-Attive-Italia.json"
 
-# settore totale (primo indice)
-settore_index = 0
+          print("Download dataset imprese attive...")
+          r = requests.get(url, timeout=60)
+          r.raise_for_status()
+          data = r.json()
 
-# funzione robusta calcolo posizione JSON-stat
-def get_value(geo_key):
-    geo_index = geo_keys.index(geo_key)
+          # =========================
+          # PARSING JSON-STAT
+          # =========================
 
-    # formula ufficiale JSON-stat (row-major order)
-    pos = (
-        geo_index * dim_sizes[1] * dim_sizes[2]
-        + settore_index * dim_sizes[2]
-        + tempo_index
-    )
+          dimension = data["dimension"]
+          dim_ids = dimension["id"]      # ordine reale dimensioni
+          dim_sizes = dimension["size"]  # dimensioni ufficiali
+          values = data["value"]
 
-    return values[pos]
+          # Assumiamo ordine: GEO, SETTORE, TEMPO
+          geo_dim = dim_ids[0]
+          settore_dim = dim_ids[1]
+          tempo_dim = dim_ids[2]
 
-# totale Italia
-totale_italia = get_value("IT")
+          geo_keys = list(dimension[geo_dim]["category"]["index"].keys())
+          settore_keys = list(dimension[settore_dim]["category"]["index"].keys())
+          tempo_keys = list(dimension[tempo_dim]["category"]["index"].keys())
 
-dataset = {}
+          # =========================
+          # ULTIMO MESE DISPONIBILE
+          # =========================
 
-for nuts, (codice, nome) in regioni.items():
-    valore = get_value(nuts)
+          ultimo_tempo = tempo_keys[-1]
+          tempo_index = tempo_keys.index(ultimo_tempo)
 
-    dataset[codice] = {
-        "nome": nome,
-        "anno_ultimo": ultimo_tempo,
-        "imprese_attive": int(valore),
-    }
+          # settore totale (primo indice)
+          settore_index = 0
 
-# quote %
-for codice in dataset:
-    quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
-    dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
+          # =========================
+          # FUNZIONE CALCOLO POSIZIONE
+          # =========================
 
-# ranking
-ordinato = sorted(
-    dataset.items(),
-    key=lambda x: x[1]["imprese_attive"],
-    reverse=True
-)
+          def get_value(geo_key):
+              geo_index = geo_keys.index(geo_key)
 
-for rank, (codice, _) in enumerate(ordinato, start=1):
-    dataset[codice]["rank_imprese"] = rank
+              # formula JSON-stat (row-major)
+              pos = (
+                  geo_index * dim_sizes[1] * dim_sizes[2]
+                  + settore_index * dim_sizes[2]
+                  + tempo_index
+              )
 
-dataset = dict(sorted(dataset.items()))
+              return values[pos]
 
-with open("imprese.json", "w", encoding="utf-8") as f:
-    json.dump(dataset, f, ensure_ascii=False, indent=2)
+          # =========================
+          # TOTALE ITALIA
+          # =========================
 
-print("imprese.json aggiornato correttamente")
+          totale_italia = get_value("IT")
+
+          dataset = {}
+
+          for nuts, (codice, nome) in regioni.items():
+              valore = get_value(nuts)
+
+              dataset[codice] = {
+                  "nome": nome,
+                  "anno_ultimo": ultimo_tempo,
+                  "imprese_attive": int(valore),
+              }
+
+          # =========================
+          # CALCOLO QUOTE %
+          # =========================
+
+          for codice in dataset:
+              quota = (dataset[codice]["imprese_attive"] / totale_italia) * 100
+              dataset[codice]["quota_percentuale_nazionale"] = round(quota, 2)
+
+          # =========================
+          # CALCOLO RANKING
+          # =========================
+
+          ordinato = sorted(
+              dataset.items(),
+              key=lambda x: x[1]["imprese_attive"],
+              reverse=True
+          )
+
+          for rank, (codice, _) in enumerate(ordinato, start=1):
+              dataset[codice]["rank_imprese"] = rank
+
+          # ordina per codice regione
+          dataset = dict(sorted(dataset.items()))
+
+          # =========================
+          # SALVATAGGIO FILE
+          # =========================
+
+          with open("imprese.json", "w", encoding="utf-8") as f:
+              json.dump(dataset, f, ensure_ascii=False, indent=2)
+
+          print("imprese.json aggiornato correttamente")
+          PYTHON
+
+      - name: Run script
+        run: python script_imprese.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add imprese.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico imprese.json"
+          git push
