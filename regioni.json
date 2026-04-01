@@ -3,160 +3,160 @@
     "nome": "Piemonte",
     "slug": "piemonte",
     "superficie_km2": 25387,
-    "anno": 2025,
-    "popolazione": 4251868,
+    "anno": 2026,
+    "popolazione": 4255006,
     "rank_popolazione": 7
   },
   "02": {
     "nome": "Valle d'Aosta",
     "slug": "valle-daosta",
     "superficie_km2": 3263,
-    "anno": 2025,
-    "popolazione": 122532,
+    "anno": 2026,
+    "popolazione": 122554,
     "rank_popolazione": 20
   },
   "03": {
     "nome": "Lombardia",
     "slug": "lombardia",
     "superficie_km2": 23863,
-    "anno": 2025,
-    "popolazione": 10033918,
+    "anno": 2026,
+    "popolazione": 10065694,
     "rank_popolazione": 1
   },
   "04": {
     "nome": "Trentino-Alto Adige",
     "slug": "trentino-alto-adige",
     "superficie_km2": 13607,
-    "anno": 2025,
-    "popolazione": 1086252,
+    "anno": 2026,
+    "popolazione": 1090818,
     "rank_popolazione": 16
   },
   "05": {
     "nome": "Veneto",
     "slug": "veneto",
     "superficie_km2": 18345,
-    "anno": 2025,
-    "popolazione": 4853472,
+    "anno": 2026,
+    "popolazione": 4857460,
     "rank_popolazione": 4
   },
   "06": {
     "nome": "Friuli-Venezia Giulia",
     "slug": "friuli-venezia-giulia",
     "superficie_km2": 7924,
-    "anno": 2025,
-    "popolazione": 1193284,
+    "anno": 2026,
+    "popolazione": 1193496,
     "rank_popolazione": 15
   },
   "07": {
     "nome": "Liguria",
     "slug": "liguria",
     "superficie_km2": 5416,
-    "anno": 2025,
-    "popolazione": 1510143,
+    "anno": 2026,
+    "popolazione": 1511988,
     "rank_popolazione": 12
   },
   "08": {
     "nome": "Emilia-Romagna",
     "slug": "emilia-romagna",
     "superficie_km2": 22453,
-    "anno": 2025,
-    "popolazione": 4461998,
+    "anno": 2026,
+    "popolazione": 4477009,
     "rank_popolazione": 6
   },
   "09": {
     "nome": "Toscana",
     "slug": "toscana",
     "superficie_km2": 22987,
-    "anno": 2025,
-    "popolazione": 3657716,
+    "anno": 2026,
+    "popolazione": 3659222,
     "rank_popolazione": 9
   },
   "10": {
     "nome": "Umbria",
     "slug": "umbria",
     "superficie_km2": 8456,
-    "anno": 2025,
-    "popolazione": 851473,
+    "anno": 2026,
+    "popolazione": 850627,
     "rank_popolazione": 17
   },
   "11": {
     "nome": "Marche",
     "slug": "marche",
     "superficie_km2": 9366,
-    "anno": 2025,
-    "popolazione": 1480545,
+    "anno": 2026,
+    "popolazione": 1479832,
     "rank_popolazione": 13
   },
   "12": {
     "nome": "Lazio",
     "slug": "lazio",
     "superficie_km2": 17232,
-    "anno": 2025,
-    "popolazione": 5709178,
+    "anno": 2026,
+    "popolazione": 5709444,
     "rank_popolazione": 2
   },
   "13": {
     "nome": "Abruzzo",
     "slug": "abruzzo",
     "superficie_km2": 10831,
-    "anno": 2025,
-    "popolazione": 1269118,
+    "anno": 2026,
+    "popolazione": 1267222,
     "rank_popolazione": 14
   },
   "14": {
     "nome": "Molise",
     "slug": "molise",
     "superficie_km2": 4460,
-    "anno": 2025,
-    "popolazione": 287814,
+    "anno": 2026,
+    "popolazione": 285940,
     "rank_popolazione": 19
   },
   "15": {
     "nome": "Campania",
     "slug": "campania",
     "superficie_km2": 13671,
-    "anno": 2025,
-    "popolazione": 5582337,
+    "anno": 2026,
+    "popolazione": 5568703,
     "rank_popolazione": 3
   },
   "16": {
     "nome": "Puglia",
     "slug": "puglia",
     "superficie_km2": 19359,
-    "anno": 2025,
-    "popolazione": 3877395,
+    "anno": 2026,
+    "popolazione": 3865277,
     "rank_popolazione": 8
   },
   "17": {
     "nome": "Basilicata",
     "slug": "basilicata",
     "superficie_km2": 9992,
-    "anno": 2025,
-    "popolazione": 530004,
+    "anno": 2026,
+    "popolazione": 525281,
     "rank_popolazione": 18
   },
   "18": {
     "nome": "Calabria",
     "slug": "calabria",
     "superficie_km2": 15080,
-    "anno": 2025,
-    "popolazione": 1834646,
+    "anno": 2026,
+    "popolazione": 1827571,
     "rank_popolazione": 10
   },
   "19": {
     "nome": "Sicilia",
     "slug": "sicilia",
     "superficie_km2": 25711,
-    "anno": 2025,
-    "popolazione": 4787390,
+    "anno": 2026,
+    "popolazione": 4775194,
     "rank_popolazione": 5
   },
   "20": {
     "nome": "Sardegna",
     "slug": "sardegna",
     "superficie_km2": 24100,
-    "anno": 2025,
-    "popolazione": 1562381,
+    "anno": 2026,
+    "popolazione": 1554490,
     "rank_popolazione": 11
   }
 }
