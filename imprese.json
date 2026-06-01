@@ -1,141 +1,141 @@
 {
   "01": {
     "nome": "Piemonte",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 373505,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 374114,
     "quota_percentuale_nazionale": 7.47,
     "rank_imprese": 6
   },
   "02": {
     "nome": "Valle d'Aosta",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 10761,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 10787,
     "quota_percentuale_nazionale": 0.22,
     "rank_imprese": 20
   },
   "03": {
     "nome": "Lombardia",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 810234,
-    "quota_percentuale_nazionale": 16.2,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 812296,
+    "quota_percentuale_nazionale": 16.22,
     "rank_imprese": 1
   },
   "04": {
     "nome": "Trentino-Alto Adige",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 105740,
-    "quota_percentuale_nazionale": 2.11,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 105959,
+    "quota_percentuale_nazionale": 2.12,
     "rank_imprese": 15
   },
   "05": {
     "nome": "Veneto",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 413035,
-    "quota_percentuale_nazionale": 8.26,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 413981,
+    "quota_percentuale_nazionale": 8.27,
     "rank_imprese": 4
   },
   "06": {
     "nome": "Friuli-Venezia Giulia",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 86527,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 86764,
     "quota_percentuale_nazionale": 1.73,
     "rank_imprese": 16
   },
   "07": {
     "nome": "Liguria",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 131592,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 131837,
     "quota_percentuale_nazionale": 2.63,
     "rank_imprese": 12
   },
   "08": {
     "nome": "Emilia-Romagna",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 382578,
-    "quota_percentuale_nazionale": 7.65,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 382633,
+    "quota_percentuale_nazionale": 7.64,
     "rank_imprese": 5
   },
   "09": {
     "nome": "Toscana",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 338932,
-    "quota_percentuale_nazionale": 6.78,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 338150,
+    "quota_percentuale_nazionale": 6.75,
     "rank_imprese": 8
   },
   "10": {
     "nome": "Umbria",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 77589,
-    "quota_percentuale_nazionale": 1.55,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 76701,
+    "quota_percentuale_nazionale": 1.53,
     "rank_imprese": 17
   },
   "11": {
     "nome": "Marche",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 130408,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 130673,
     "quota_percentuale_nazionale": 2.61,
     "rank_imprese": 13
   },
   "12": {
     "nome": "Lazio",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 465112,
-    "quota_percentuale_nazionale": 9.3,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 466198,
+    "quota_percentuale_nazionale": 9.31,
     "rank_imprese": 3
   },
   "13": {
     "nome": "Abruzzo",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 121246,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 120930,
     "quota_percentuale_nazionale": 2.42,
     "rank_imprese": 14
   },
   "14": {
     "nome": "Molise",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 28864,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 28888,
     "quota_percentuale_nazionale": 0.58,
     "rank_imprese": 19
   },
   "15": {
     "nome": "Campania",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 477336,
-    "quota_percentuale_nazionale": 9.55,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 478541,
+    "quota_percentuale_nazionale": 9.56,
     "rank_imprese": 2
   },
   "16": {
     "nome": "Puglia",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 324985,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 325623,
     "quota_percentuale_nazionale": 6.5,
     "rank_imprese": 9
   },
   "17": {
     "nome": "Basilicata",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 50950,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 51015,
     "quota_percentuale_nazionale": 1.02,
     "rank_imprese": 18
   },
   "18": {
     "nome": "Calabria",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 155168,
-    "quota_percentuale_nazionale": 3.1,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 155487,
+    "quota_percentuale_nazionale": 3.11,
     "rank_imprese": 10
   },
   "19": {
     "nome": "Sicilia",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 373388,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 373881,
     "quota_percentuale_nazionale": 7.47,
     "rank_imprese": 7
   },
   "20": {
     "nome": "Sardegna",
-    "anno_ultimo": "2026-03-31",
-    "imprese_attive": 142441,
+    "anno_ultimo": "2026-04-30",
+    "imprese_attive": 142762,
     "quota_percentuale_nazionale": 2.85,
     "rank_imprese": 11
   }
